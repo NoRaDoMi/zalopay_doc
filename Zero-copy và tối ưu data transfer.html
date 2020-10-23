@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<!-- saved from url=(0082)https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/ -->
+<html lang="en" class="wf-ruda-n7-active wf-ruda-n9-active wf-merriweather-n7-active wf-merriweather-n4-active wf-firamono-n4-active wf-ruda-n4-active wf-merriweather-n3-active wf-active" style="transform: none;"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><style type="text/css" id="dark-mode-custom-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Zero-copy và tối ưu data transfer</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" type="text/css" href="./Zero-copy và tối ưu data transfer_files/main.css">
+
+    <link rel="shortcut icon" href="https://engineering.zalopay.vn/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/amp/">
+    
+    <meta property="og:site_name" content="ZaloPay Engineering">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Zero-copy và tối ưu data transfer">
+    <meta property="og:description" content="Trong một thế giới mà mọi thứ đều có thể kết nối với nhau qua internet, nhu cầu trao đổi dữ liệu giữa các máy tính hoặc các thiết bị số với nhau là không thể tránh khỏi. Dữ liệu sẽ được chia sẻ từ nơi này đến nơi khác,">
+    <meta property="og:url" content="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/">
+    <meta property="og:image" content="http://engineering.zalopay.vn/content/images/2019/04/dataTransferZeroCopy-1.png">
+    <meta property="article:published_time" content="2019-04-16T08:31:04.000Z">
+    <meta property="article:modified_time" content="2019-05-07T03:09:25.000Z">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Zero-copy và tối ưu data transfer">
+    <meta name="twitter:description" content="Trong một thế giới mà mọi thứ đều có thể kết nối với nhau qua internet, nhu cầu trao đổi dữ liệu giữa các máy tính hoặc các thiết bị số với nhau là không thể tránh khỏi. Dữ liệu sẽ được chia sẻ từ nơi này đến nơi khác,">
+    <meta name="twitter:url" content="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/">
+    <meta name="twitter:image" content="http://engineering.zalopay.vn/content/images/2019/04/dataTransferZeroCopy-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Nguyễn Huỳnh Thoại">
+    <meta property="og:image:width" content="748">
+    <meta property="og:image:height" content="555">
+    
+    <script type="text/javascript" async="" src="./Zero-copy và tối ưu data transfer_files/analytics.js"></script><script src="./Zero-copy và tối ưu data transfer_files/webfont.js" type="text/javascript" async=""></script><script async="" src="./Zero-copy và tối ưu data transfer_files/default" charset="UTF-8" crossorigin="*"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ZaloPay Engineering",
+        "logo": "http://engineering.zalopay.vn/favicon.ico"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Nguyễn Huỳnh Thoại",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://engineering.zalopay.vn/content/images/2019/04/53160432_554374244971763_3315427384840159232_o.jpg",
+            "width": 1440,
+            "height": 1440
+        },
+        "url": "http://engineering.zalopay.vn/author/nguyen-huynh-thoai/",
+        "sameAs": []
+    },
+    "headline": "Zero-copy và tối ưu data transfer",
+    "url": "http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/",
+    "datePublished": "2019-04-16T08:31:04.000Z",
+    "dateModified": "2019-05-07T03:09:25.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://engineering.zalopay.vn/content/images/2019/04/dataTransferZeroCopy-1.png",
+        "width": 748,
+        "height": 555
+    },
+    "description": "Trong một thế giới mà mọi thứ đều có thể kết nối với nhau qua internet, nhu cầu trao đổi dữ liệu giữa các máy tính hoặc các thiết bị số với nhau là không thể tránh khỏi. Dữ liệu sẽ được chia sẻ từ nơi này đến nơi khác,",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://engineering.zalopay.vn/"
+    }
+}
+    </script>
+
+    <script src="./Zero-copy và tối ưu data transfer_files/ghost-sdk.min.js"></script>
+<script>
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "404c2ad841f6"
+});
+</script>
+    <meta name="generator" content="Ghost 2.9">
+    <link rel="alternate" type="application/rss+xml" title="ZaloPay Engineering" href="http://engineering.zalopay.vn/rss/">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./Zero-copy và tối ưu data transfer_files/js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141214835-1');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e1d2d447e39ea1242a474e4/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<link rel="stylesheet" href="./Zero-copy và tối ưu data transfer_files/css" media="all"><script src="./Zero-copy và tối ưu data transfer_files/embed.js" data-timestamp="1603449175221"></script><style type="text/css">@keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-moz-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-webkit-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}#rhW4sWO-1603449175283{outline:none!important;visibility:visible!important;resize:none!important;box-shadow:none!important;overflow:visible!important;background:none!important;opacity:1!important;filter:alpha(opacity=100)!important;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity1)!important;-moz-opacity:1!important;-khtml-opacity:1!important;top:auto!important;right:10px!important;bottom:90px!important;left:auto!important;position:fixed!important;border:0!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;padding:0!important;margin:0!important;-moz-transition-property:none!important;-webkit-transition-property:none!important;-o-transition-property:none!important;transition-property:none!important;transform:none!important;-webkit-transform:none!important;-ms-transform:none!important;width:auto!important;height:auto!important;display:none!important;z-index:2000000000!important;background-color:transparent!important;cursor:auto!important;float:none!important;border-radius:unset!important;pointer-events:auto!important}#ZIXlbFG-1603449175284.open{animation : tawkMaxOpen .25s ease!important;}</style><link rel="prefetch" as="style" href="https://c.disquscdn.com/next/embed/styles/lounge.a8dc02def3107413d47189b1bce61bd9.css"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/common.bundle.847783fd9a0d1b9b80a706571a35d786.js"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/lounge.bundle.f86a840f3451e5487a277f1443585291.js"><link rel="prefetch" as="script" href="https://disqus.com/next/config.js"><style id="theia-sticky-sidebar-stylesheet-TSS">.theiaStickySidebar:after {content: ""; display: table; clear: both;}</style><script src="./Zero-copy và tối ưu data transfer_files/alfalfalfa.0823c767a3bc925f628afd9bed26c958.js" async="" charset="UTF-8"></script></head>
+<body class="is-article clickup-chrome-ext_installed" data-page="http://engineering.zalopay.vn" style="transform: none;" cz-shortcut-listen="true">
+
+    <header class="header u-sizeFullWidth u-bgColor">
+    <div class="header-wrap u-flexCenter u-relative">
+
+        <a class="header-logo u-inlineBlock u-flex0" href="http://engineering.zalopay.vn/">
+            <span class="u-fontSizeLarge u-fontWeightBolder">ZaloPay Engineering</span>
+        </a>
+
+        <nav class="nav u-flex u-flex1 u-paddingLeft20 u-flexCenter u-hide-before-md"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="header-left u-flex0 u-flex u-flexEnd u-fontSize21">
+
+            
+            
+
+            <div class="followMe follow-more u-hide-before-md"></div>
+
+
+            <a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="follow-toggle u-relative u-fontSizeLarge u-hide u-hide-before-md i-more"></a>
+            <span class="header-line u-hide-before-md"></span>
+            <a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="search-toggle u-relative i-search"></a>
+            <a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="menu--toggle u-relative u-hide-after-md"><span></span><span></span><span></span></a>
+
+        </div>
+    </div>
+
+    <aside class="sideNav u-absolute0 u-hide-after-md u-bgColor">
+    <div class="sideNav-wrap u-absolute0">
+        <nav class="sideNav-menu"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="sideNav-follow followMe u-fontSize20 u-paddingTop20 u-paddingLeft20 u-paddingRight20">
+            
+            
+        </div>
+    </div>
+</aside>
+
+</header>
+
+    <main class="main u-relative" style="transform: none;">
+<section class="post extreme-container u-marginTop30 u-marginBottom40" style="transform: none;">
+    <div class="row" style="transform: none;">
+        
+        <div class="col-left" style="transform: none;">
+            
+<div class="post-header">
+    
+
+    <h1 class="post-title u-fontSize40 u-contentTitle u-md-fontSizeLarger">Zero-copy và tối ưu data transfer</h1>
+
+</div>
+
+
+            
+<div class="post-author u-flex u-flexCenter u-marginTop20">
+    <div class="u-flex0">
+        <a href="https://engineering.zalopay.vn/author/nguyen-huynh-thoai/" style="background-image:url(/content/images/2019/04/53160432_554374244971763_3315427384840159232_o.jpg)" class="avatar-image avatar-image--smaller u-backgroundSizeCover u-relative "></a>
+    </div>
+
+    <div class="u-paddingLeft15 u-textColorNormal u-flex1 u-fontSizeSmaller u-lineHeight1">
+
+        <div class="u-block">
+            <time class="datetime" datetime=" 2019-04-16 ">Published 2 years ago</time>
+            <span class="point">—</span>
+            <span class="readingTime">7 min read</span>
+        </div>
+
+
+        <div class="u-block u-paddingTop5">
+            By <a href="https://engineering.zalopay.vn/author/nguyen-huynh-thoai/" class="mapache-tracking link link--underline u-fontWeightBold u-textColorDarker" title="Posts by Nguyễn Huỳnh Thoại" data-event-category="Article" data-event-action="Author - Nguyễn Huỳnh Thoại" data-event-label="Profile" data-event-non-interaction="1">Nguyễn Huỳnh Thoại</a>
+
+            
+            
+        </div>
+
+    </div>
+</div>
+
+
+
+                <figure class="post-image u-block u-marginAuto u-maxWidth1000">
+                    <img src="./Zero-copy và tối ưu data transfer_files/dataTransferZeroCopy-1.png" class="u-block u-marginAuto" alt="Zero-copy và tối ưu data transfer" data-action="zoom">
+                </figure>
+
+
+            
+<article class="post-body u-relative" style="transform: none;">
+    <div class="sharePost u-textAlignCenter u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+    
+    
+    
+    
+    
+    
+<div class="theiaStickySidebar" style="padding-top: 1px; padding-bottom: 1px; position: static; transform: none;"><a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share button--circle i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/"></a><a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share button--circle i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/" data-title="Zero-copy và tối ưu data transfer "></a><a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share button--circle i-reddit bg-reddit u-fontSize20" data-share="reddit" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/"></a><a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share button--circle i-linkedin bg-linkedin u-fontSize20" data-share="linkedin" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/"></a><a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share button--circle i-pinterest bg-pinterest u-fontSize20" data-share="pinterest" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/" data-title="Zero-copy và tối ưu data transfer"></a></div></div>
+
+    <div class="post-body-wrap">
+        <p>Trong một thế giới mà mọi thứ đều có thể kết nối với nhau qua internet, nhu cầu trao đổi dữ liệu giữa các máy tính hoặc các thiết bị số với nhau là không thể tránh khỏi. Dữ liệu sẽ được chia sẻ từ nơi này đến nơi khác, đứng trước bài toán đó, chúng ta sẽ hiện thực như thế nào?</p><h2 id="h-ng-ti-p-c-n-truy-n-th-ng">Hướng tiếp cận truyền thống</h2><p>Xem xét một tình huống đọc dữ liệu từ một file và truyền dữ liệu đó tới một chương tình khác thông qua network (tình huống này mô tả hành vi của nhiều ứng dụng phía server bao gồm Web server cung cấp web tĩnh, FTP server, mail server, v,v). Phần lõi của ứng dụng sẽ có hai lời gọi như sau:</p><pre class="line-numbers"><code>File.read(fileDesc, buf, len);
+Socket.send(socket, buf, len);</code></pre><p>Ở bên dưới hai lệnh trên là bốn lần chuyển ngữ cảnh (context switch) giữa user mode và kernel mode, và dữ liệu cũng được sao chép bốn lần trước khi hai lời gọi trên hoàn thành.</p><figure class="kg-card kg-image-card"><img src="./Zero-copy và tối ưu data transfer_files/1_thK9a4f41BtCIidb4ZIJug.png" class="kg-image" alt="1_thK9a4f41BtCIidb4ZIJug" data-action="zoom"><figcaption>Hình 1: Cách sao chép dữ liệu truyền thống</figcaption></figure><p>Các bước ở trên bao gồm:</p><ol><li>Lệnh <code>read()</code> gây ra context switch từ user mode tới kernel mode. Bên dưới hàm <code>sys_read()</code> (hoặc syscall tương ứng) sẽ đọc dữ liệu từ file. Lần sao chép đầu tiên được thực hiện bởi DMA (direct memory access) engine, nó sẽ đọc nội dung từ điã và lưu trữ chúng trên không gian địa chỉ kernel.</li><li>Dữ liệu được trên sẽ được sao chép từ kernel buffer tới user buffer, và lênh <code>read()</code> sẽ trả về. Việc trả về sẽ gây ra một context switch nữa để chuyển từ kernel mode về user mode. Dữ liệu được lưu trên không gian điạ chỉ user.</li><li>Lệnh <code>send()</code> được gọi sẽ lần thứ ba gây ra context switch từ user mode tới kernel mode. Lần sao chép thứ ba là sao chép dữ liệu từ user buffer tới một kernel buffer khác liên kết với socket đích.</li><li>Lệnh <code>send()</code> trả về tạo ra lần thứ tư context switch. Một cách độc lập và bất đồng bộ, lần sao chép thứ tư sẽ gây ra bởi DMA engine để chuyển dữ liệu từ kernel socket buffer tới protocol engine.</li></ol><p>Do sự chênh lệch khá lớn về thời gian xử lý giữa CPU và đĩa, kernel buffer được thêm vào tiến trình đóng vai trò như là một "read ahead cache". Như vậy mỗi khi có lệnh đọc đĩa thứ hai, mà dữ liệu đã có sẵn trên kernel buffer thì lệnh gọi đọc sẽ trả về và không cần truy xuất đĩa nữa.</p><p>Điều không may là hướng tiếp cận đó cũng trở thành một "thắt cổ chai" của hiệu năng hệ thống nếu kích thước của dữ liệu được yêu cầu lớn hơn kích thước của kernel buffer. Dữ liệu sẽ phải được chia nhỏ và sao chép nhiều lần giữa đĩa, kernel buffer, user buffer trước khi hoàn thành, chi phí sao chép và chuyển ngữ cảnh tương đối lớn.</p><h2 id="h-ng-ti-p-c-n-d-ng-mmap-">Hướng tiếp cận dùng mmap()</h2><p>Chúng ta có thể lược bỏ lần sao chép dữ liệu từ kernel buffer đến user buffer (application buffer) bằng cách cho chúng tham chiếu đến cùng một vùng nhớ trên kernel bằng cách dùng &nbsp;<code>mmap() </code> system call.</p><pre class="line-numbers  language-c"><code class="  language-c">tmp_buf = mmap(file, len);
+write(socket, tmp_buf, len);
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="kg-card kg-image-card"><img src="./Zero-copy và tối ưu data transfer_files/Untitled-Diagram--1---2-.png" class="kg-image" data-action="zoom"><figcaption>Hình 2: Dùng mmap() syscall</figcaption></figure><p>Cách làm trên tuy lược bỏ được một lần sao chép dữ liệu, tuy nhiên vẫn có bốn lần chuyển ngữ cảnh.</p><p>Mỗi lần dữ liệu di chuyển qua ranh giới user-kernel, nó phải được sao chép làm tiêu tốn CPU cycles và memory bandwidth. Tuy nhiên, chúng ta có thể lược bỏ một số lần sao chép dư thừa bằng một kĩ thuật gọi là <em>zero-copy.</em> Chương trình sử dụng zero-copy sẽ yêu cầu kernel sao chép dữ liệu trực tiếp từ đĩa tới socket, diễn ra hoàn toàn ở kernel space mà không thông qua user space. Kĩ thuật Zero-copy làm giảm một số lần chuyển ngữ cảnh và sao chép dữ liệu do đó làm tăng hiệu năng của hệ thống.</p><h2 id="h-ng-ti-p-c-n-v-i-k-thu-t-zero-copy">Hướng tiếp cận với kĩ thuật Zero-copy</h2><p>Nếu chúng ta xem xét cách hiện thực truyền thống, thì sẽ chú ý rằng lần sao chép dữ liệu thứ hai và thứ ba là không thực sự cần thiết bởi vì dữ liệu ở user space cũng không được thay đổi. Thay vì vậy, dữ liệu được chuyển trực tiếp từ read buffer đến socket buffer. Hàm <code>transferTo()</code> sẽ làm chính xác việc này.</p><pre class="line-numbers"><code>public void transferTo(long position, long count, WritableByteChannel target);
+</code></pre><p>Hàm <code>transferTo()</code> sẽ chuyển dữ liệu từ kênh file đến một kênh ghi cho trước. Ở bên dưới hệ điều hành UNIX và nhiều phiên bản Linux, lệnh gọi trên sẽ gọi system call <code>sendfile()</code>.</p><pre class="line-numbers"><code>#include &lt;sys/socket.h&gt;
+ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
+</code></pre><p>Hành động của <code>file.read()</code> và <code>socket.send()</code>, có thể được thay thế bởi một lời gọi <code>transferTo()</code>, được trình bày ở trên.</p><figure class="kg-card kg-image-card"><img src="./Zero-copy và tối ưu data transfer_files/1_fIqkJtGifXxYJTb7XMtguA.png" class="kg-image" alt="1_fIqkJtGifXxYJTb7XMtguA" data-action="zoom"><figcaption>Hình 3: Sao chép dữ liệu với transferTo()</figcaption></figure><p>Các bước xảy ra khi sử dụng hàm <code>transferTo()</code> là:</p><ol><li>Sao chép nội dung file từ đĩa đến kernel read buffer bằng DMA engine.</li><li>Dữ liệu sẽ được sao chép từ kernel read buffer đến kernel socket buffer.</li><li>DMA engine truyền dữ liệu từ kernel socket buffer tới protocol engine.</li></ol><p>Đó là một sự cải thiện: chúng ta sẽ giảm số lần context switch từ bốn xuống hai và giảm số lần sao chép dữ liệu từ bốn xuống ba (trong đó chỉ một lần thực hiện bởi CPU). Nhưng nó không hoàn toàn đưa chúng ta đến mục tiêu của zero-copy như tên gọi của chúng là không có bất kì sao chép nào.</p><p>Xa hơn, chúng ta có thể lược bỏ lần sao chép kernel buffer còn lại được thực hiện bởi CPU nếu bên dưới giao diện network card có thể hỗ trợ "gather operations". Ở Linux kernels 2.4 và về sau, socket buffer được thay đổi để phù hợp với yêu cầu trên.</p><figure class="kg-card kg-image-card"><img src="./Zero-copy và tối ưu data transfer_files/1_BzuSPQfZJ1fYIgi2MT0ehw.png" class="kg-image" alt="1_BzuSPQfZJ1fYIgi2MT0ehw" data-action="zoom"><figcaption>Hình 4: Sao chép dữ liệu khi transferTo() và "gather operations"</figcaption></figure><p>Ở phiên bản Linux kernel 2.4 về sau, hàm transferTo() sẽ thực hiện:</p><ol><li>Sao chép nội dung file từ đĩa đến kernel buffer bởi DMA engine.</li><li>Thông tin về nơi chứa và kích thước của dữ liệu được thêm vào socket buffer. DMA engine chuyển dữ liệu trực tiếp từ kernel buffer đến protocol engine, do đó sẽ lược bỏ lần sao chép được thực hiện bởi CPU cuối cùng.</li></ol><p>Các hàm hỗ trợ zero-copy cũng chỉ chuyển được gửi tối đa ~2GB trong một lần gọi (còn tùy thuộc vào hệ thống), nếu chúng ta muốn gửi dữ liệu lớn hơn con số đó thì phải gọi lệnh nhiều lần.</p><figure class="kg-card kg-image-card"><img src="./Zero-copy và tối ưu data transfer_files/1_DQdSLlWc6trkv1qJx0duLA.png" class="kg-image" alt="1_DQdSLlWc6trkv1qJx0duLA" data-action="zoom"><figcaption>Nguồn : <a href="https://developer.ibm.com/articles/j-zerocopy/">https://developer.ibm.com/articles/j-zerocopy/</a></figcaption></figure><h2 id="khi-n-o-zero-copy-kh-ng-c-s-d-ng">Khi nào Zero-copy không được sử dụng</h2><p>Zero-copy không được sử dụng trong trường hợp dữ liệu được yêu cầu cần thay đổi khi chuyển nó tới kênh bên kia, khi đó dữ liệu bắt buộc phải được đưa lên user space để xử lý. Ví dụ giao thức SSL/TLS cần mã hóa dữ liệu trước khi chuyển thì zero-copy sẽ không giúp ích trong trường hợp này.</p><h2 id="t-ng-k-t">Tổng kết</h2><p>Chúng ta đã hiểu được cách mà zero-copy hoạt động cũng như lợi ích của nó, phần lớn các ngôn ngữ lập trình cũng đều hỗ trợ kĩ thuật này, do đó nếu ứng dụng có tính chất trao đổi dữ liệu tĩnh giữa các hệ thống, thì zero-copy là kĩ thuật cần được xem xét và áp dụng.</p><h3 id="tham-kh-o-">Tham khảo :</h3><p><a href="https://developer.ibm.com/articles/j-zerocopy/">https://developer.ibm.com/articles/j-zerocopy/</a><br><a href="https://www.usna.edu/Users/cs/aviv/classes/ic221/s16/lec/11/lec.html">https://www.usna.edu/Users/cs/aviv/classes/ic221/s16/lec/11/lec.html</a><br><a href="https://passing-marks.blogspot.com/2017/03/unix-34-advantages-and-disadvantages-of.html">https://passing-marks.blogspot.com/2017/03/unix-34-advantages-and-disadvantages-of.html</a><br><a href="https://www.joshbialkowski.com/posts/2018/linux_zero_copy/linux-zero-copy.html">https://www.joshbialkowski.com/posts/2018/linux_zero_copy/linux-zero-copy.html</a></p>
+
+        
+        <div class="row u-marginTop30 prev-next">
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/postgresql-used-fsync-incorrectly-for-20-years/" class="prev-next-link u-block u-marginBottom10">
+            <span class="prev-next-span u-block"><i class="i-arrow-round-prev u-fontSizeLarge arrow-left"></i> Prev article</span>
+            <h5 class="prev-next-title">PostgreSQL và vấn đề trong 20 năm với fsync</h5>
+        </a>
+    </div>
+
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/kubernetes-helm/" class="prev-next-link u-block u-marginBottom10" style="text-align:right">
+            <span class="prev-next-span u-block">Next article <i class="i-arrow-round-next u-fontSizeLarge arrow-right"></i></span>
+            <h5 class="prev-next-title">Helm - The Kubernetes Package Manager</h5>
+        </a>
+    </div>
+</div>
+
+        <div class="row mob-share u-marginTop30 u-hide-after-lg">
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/"> <span class="share-title">SHARE</span></a>
+    </div>
+
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/#" class="mapache-share i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/" data-title="Zero-copy và tối ưu data transfer "> <span class="share-title">TWEET</span></a>
+    </div>
+</div>
+
+        <hr class="post-footer-hr">
+
+        
+
+    </div>
+</article>
+
+
+
+<div class="post-comments-overlay u-absolute0 toggle-comments"></div>
+
+
+
+        </div>
+
+        <aside class="sidebar col-right sidebar-sticky u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+                
+
+    
+    
+
+
+
+    
+<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none;"><div class="sidebar-items u-marginBottom30 u-flexColumn">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Latest Articles</span></h3>
+
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">1</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Tìm hiểu API Gateway (Spring Cloud Gateway &amp; Zuul 2)</h3>
+        <a href="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">2</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Sử dụng RegEx để trích xuất OTP ngân hàng</h3>
+        <a href="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">3</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h3>
+        <a href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">4</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Hướng dẫn tích hợp gRPC-Web vào React JS app</h3>
+        <a href="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">5</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">OTP của VNG được sinh ra như thế nào?</h3>
+        <a href="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</div><div class="sidebar-items u-marginBottom30">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Tag Cloud</span></h3>
+
+        <a href="http://engineering.zalopay.vn/tag/distributed/" title="distributed" class="button tag-button">distributed</a>
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-system/" title="distributed system" class="button tag-button">distributed system</a>
+        <a href="http://engineering.zalopay.vn/tag/backend/" title="backend" class="button tag-button">backend</a>
+        <a href="http://engineering.zalopay.vn/tag/tidb/" title="TiDB" class="button tag-button">TiDB</a>
+        <a href="http://engineering.zalopay.vn/tag/raft/" title="raft" class="button tag-button">raft</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-database/" title="distributed database" class="button tag-button">distributed database</a>
+        <a href="http://engineering.zalopay.vn/tag/golang/" title="golang" class="button tag-button">golang</a>
+        <a href="http://engineering.zalopay.vn/tag/2pc/" title="2PC" class="button tag-button">2PC</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-transaction/" title="distributed transaction" class="button tag-button">distributed transaction</a>
+</div><div class="widget-twitter sidebar-items u-hide">
+        <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder">
+            <span class="u-paddingBottom10 u-inlineBlock">Recents Tweets</span>
+        </h3>
+    </div></div></aside>
+    </div>
+    
+<div id="disqus_thread"><iframe id="dsq-app3091" name="dsq-app3091" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./Zero-copy và tối ưu data transfer_files/saved_resource.html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 395px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://https-engineering-zalopay-vn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+
+</section>
+
+
+<div class="instagram u-overflowHidden u-hide u-relative u-backgroundWhite">
+    <div class="instagram-wrap row"></div>
+    <span class="instagram-name u-absolute"></span>
+</div>
+</main>
+
+    <footer class="footer u-fontSizeSmaller u-fontWeightBold">
+    <div class="footer-links">
+
+        <div class="extreme-container u-flexCenter u-flexColumn">
+            <aside class="follow followMe u-textColorWhite u-fontSize20 u-textAlignCenter">
+                
+                
+                
+            </aside>
+
+            <ul class="footer-menu u-textUppercase u-textAlignCenter u-marginTop20 u-hide"></ul>
+        </div>
+
+
+    </div>
+
+    <div class="footer-copy u-textAlignCenter">
+        © 2020 <a href="http://engineering.zalopay.vn/">ZaloPay Engineering</a>
+        Design with <i class="i-favorite animated infinite pulse" style="color:red;display:inline-block"></i> by <a href="https://goo.gl/Jf1tZe" target="_blank" title="Developer FullStack.">@GodoFredoNinja</a>
+    </div>
+</footer>
+
+    <div class="search u-fixed">
+    <form class="search-form u-relative u-sizeFullWidth u-marginAuto u-marginBottom20">
+        <input id="search-field" class="u-sizeFullWidth u-md-fontSizeBase u-fontSize40 u-fontWeightSemibold" type="text" placeholder="Search...">
+    </form>
+
+    <div id="searchResults" class="search-results u-marginAuto u-sizeFullWidth"></div>
+</div>
+
+    <div class="loadingBar"></div>
+
+    
+
+    <script src="./Zero-copy và tối ưu data transfer_files/jquery.min.js"></script>
+
+    
+
+    <script src="./Zero-copy và tối ưu data transfer_files/main.js"></script>
+
+    
+<div id="fb-root"></div>
+
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://engineering.zalopay.vn/toi-uu-viec-truyen-du-lieu-bang-ki-thuat-zero-copy/';
+        this.page.identifier = 'ghost-5cb54de3b3e4be0001095ce6';
+    };
+
+    var $showComments = $('.post-comments-show');
+
+    (function(d, s, id) {
+        if (typeof disqusShortName !== 'undefined') {
+            $('.mapache-disqus').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js = d.createElement(s);
+            js.src = 'https://'+disqusShortName+'.disqus.com/embed.js';
+            js.async = true;
+
+            js.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(js);
+        } else if (typeof facebookLocaleComments !== 'undefined') {
+            $('.mapache-facebook').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://connect.facebook.net/'+facebookLocaleComments+'/sdk.js#xfbml=1&version=v3.1';
+            js.async = true;
+            fjs.parentNode.insertBefore(js, fjs);
+        } else {
+            $showComments.remove();
+        }
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+    <script>
+        Prism.plugins.autoloader.languages_path = 'http://engineering.zalopay.vn/assets/scripts/components/';
+        $('.post-body').find('pre').addClass('line-numbers');
+    </script>
+
+    <script>WebFontConfig ={google:{families:['Ruda:400,700,900','Merriweather:300,400,700','Fira+Mono:400']}};(function(){var wf=document.createElement('script');wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';wf.type='text/javascript';wf.async='true';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(wf,s);})();</script>
+
+
+<iframe style="display: none;" src="./Zero-copy và tối ưu data transfer_files/saved_resource(1).html"></iframe><div id="rhW4sWO-1603449175283" class="" style="display: block !important;"><iframe id="ZIXlbFG-1603449175284" src="./Zero-copy và tối ưu data transfer_files/saved_resource(2).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; position: static !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 350px !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; display: none !important; height: 120px !important;"></iframe><iframe id="WRm07KP-1603449175286" src="./Zero-copy và tối ưu data transfer_files/saved_resource(3).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; z-index: 1000001 !important; cursor: auto !important; float: none !important; pointer-events: auto !important; box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 10px 0px !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; width: 60px !important; min-width: 60px !important; max-width: 60px !important; border-radius: 50% !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; margin: 0px !important; top: auto !important; bottom: 20px !important; right: 20px !important; left: auto !important; display: block !important;"></iframe><iframe id="WFqlWcd-1603449175286" src="./Zero-copy và tối ưu data transfer_files/saved_resource(4).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; display: none !important; z-index: 1000003 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; top: auto !important; bottom: 60px !important; right: 15px !important; left: auto !important; width: 21px !important; max-width: 21px !important; min-width: 21px !important; height: 21px !important; max-height: 21px !important; min-height: 21px !important;"></iframe><iframe id="v370nVq-1603449175402" src="./Zero-copy và tối ưu data transfer_files/saved_resource(5).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; bottom: 30px !important; top: auto !important; right: 0px !important; left: auto !important; width: 124px !important; max-width: 124px !important; min-width: 124px !important; height: 95px !important; max-height: 95px !important; min-height: 95px !important; z-index: 1000002 !important; margin: 0px !important; display: none !important;"></iframe><div class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 100% !important; display: none !important; z-index: 1000001 !important; cursor: move !important; float: left !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="OMcsXVU-1603449175283" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 6px !important; height: 100% !important; display: block !important; z-index: 999998 !important; cursor: w-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="cZowzHu-1603449175283" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: 0px !important; bottom: auto !important; left: auto !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 6px !important; display: block !important; z-index: 999998 !important; cursor: n-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="kR2X3Te-1603449175284" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 12px !important; height: 12px !important; display: block !important; z-index: 999998 !important; cursor: nw-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><iframe id="YFUzFM1-1603449175675" src="./Zero-copy và tối ưu data transfer_files/saved_resource(6).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 378px !important; height: 876px !important; display: none !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; bottom: 100px !important; top: auto !important; right: 20px !important; left: auto !important;"></iframe></div><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./Zero-copy và tối ưu data transfer_files/saved_resource(7).html"></iframe><div id="eJOY__extension_root" class="eJOY__extension_root_class" style="all: unset;"></div></body></html>

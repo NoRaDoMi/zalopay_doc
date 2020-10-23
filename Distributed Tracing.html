@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<!-- saved from url=(0051)https://engineering.zalopay.vn/distributed-tracing/ -->
+<html lang="en" class="wf-ruda-n4-active wf-ruda-n7-active wf-ruda-n9-active wf-merriweather-n4-active wf-merriweather-n7-active wf-firamono-n4-active wf-merriweather-n3-active wf-active" style="transform: none;"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><style type="text/css" id="dark-mode-custom-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Distributed Tracing</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" type="text/css" href="./Distributed Tracing_files/main.css">
+
+    <link rel="shortcut icon" href="https://engineering.zalopay.vn/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="http://engineering.zalopay.vn/distributed-tracing/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://engineering.zalopay.vn/distributed-tracing/amp/">
+    
+    <meta property="og:site_name" content="ZaloPay Engineering">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Distributed Tracing">
+    <meta property="og:description" content="Đặt vấn đề Do sự ra đời của kiến trúc microservice, các service gọi lẫn nhau, đã dẫn đến một nhu cầu là: Làm thế nào để các nhà phát triển biết service nào đang chạy tốt, service nào đang gặp phải lỗi, độ trễ ở đâu là cao,... bên">
+    <meta property="og:url" content="http://engineering.zalopay.vn/distributed-tracing/">
+    <meta property="og:image" content="http://engineering.zalopay.vn/content/images/2020/03/distri.png">
+    <meta property="article:published_time" content="2020-03-03T11:29:33.000Z">
+    <meta property="article:modified_time" content="2020-03-13T06:35:56.000Z">
+    <meta property="article:tag" content="Skywalking">
+    <meta property="article:tag" content="Jaeger">
+    <meta property="article:tag" content="Zipkin">
+    <meta property="article:tag" content="Distributed Tracing">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Distributed Tracing">
+    <meta name="twitter:description" content="Đặt vấn đề Do sự ra đời của kiến trúc microservice, các service gọi lẫn nhau, đã dẫn đến một nhu cầu là: Làm thế nào để các nhà phát triển biết service nào đang chạy tốt, service nào đang gặp phải lỗi, độ trễ ở đâu là cao,... bên">
+    <meta name="twitter:url" content="http://engineering.zalopay.vn/distributed-tracing/">
+    <meta name="twitter:image" content="http://engineering.zalopay.vn/content/images/2020/03/distri.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Bành Đại Nam">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Skywalking, Jaeger, Zipkin, Distributed Tracing">
+    <meta property="og:image:width" content="370">
+    <meta property="og:image:height" content="355">
+    
+    <script type="text/javascript" async="" src="./Distributed Tracing_files/analytics.js"></script><script src="./Distributed Tracing_files/webfont.js" type="text/javascript" async=""></script><script async="" src="./Distributed Tracing_files/default" charset="UTF-8" crossorigin="*"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ZaloPay Engineering",
+        "logo": "http://engineering.zalopay.vn/favicon.ico"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Bành Đại Nam",
+        "url": "http://engineering.zalopay.vn/author/nambd2/",
+        "sameAs": []
+    },
+    "headline": "Distributed Tracing",
+    "url": "http://engineering.zalopay.vn/distributed-tracing/",
+    "datePublished": "2020-03-03T11:29:33.000Z",
+    "dateModified": "2020-03-13T06:35:56.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://engineering.zalopay.vn/content/images/2020/03/distri.png",
+        "width": 370,
+        "height": 355
+    },
+    "keywords": "Skywalking, Jaeger, Zipkin, Distributed Tracing",
+    "description": "Đặt vấn đề Do sự ra đời của kiến trúc microservice, các service gọi lẫn nhau, đã dẫn đến một nhu cầu là: Làm thế nào để các nhà phát triển biết service nào đang chạy tốt, service nào đang gặp phải lỗi, độ trễ ở đâu là cao,... bên",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://engineering.zalopay.vn/"
+    }
+}
+    </script>
+
+    <script src="./Distributed Tracing_files/ghost-sdk.min.js"></script>
+<script>
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "404c2ad841f6"
+});
+</script>
+    <meta name="generator" content="Ghost 2.9">
+    <link rel="alternate" type="application/rss+xml" title="ZaloPay Engineering" href="http://engineering.zalopay.vn/rss/">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./Distributed Tracing_files/js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141214835-1');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e1d2d447e39ea1242a474e4/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<link rel="stylesheet" href="./Distributed Tracing_files/css" media="all"><script src="./Distributed Tracing_files/embed.js" data-timestamp="1603449130752"></script><link rel="prefetch" as="style" href="https://c.disquscdn.com/next/embed/styles/lounge.a8dc02def3107413d47189b1bce61bd9.css"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/common.bundle.847783fd9a0d1b9b80a706571a35d786.js"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/lounge.bundle.f86a840f3451e5487a277f1443585291.js"><link rel="prefetch" as="script" href="https://disqus.com/next/config.js"><style type="text/css">@keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-moz-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-webkit-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}#qma9iRn-1603449131002{outline:none!important;visibility:visible!important;resize:none!important;box-shadow:none!important;overflow:visible!important;background:none!important;opacity:1!important;filter:alpha(opacity=100)!important;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity1)!important;-moz-opacity:1!important;-khtml-opacity:1!important;top:auto!important;right:10px!important;bottom:90px!important;left:auto!important;position:fixed!important;border:0!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;padding:0!important;margin:0!important;-moz-transition-property:none!important;-webkit-transition-property:none!important;-o-transition-property:none!important;transition-property:none!important;transform:none!important;-webkit-transform:none!important;-ms-transform:none!important;width:auto!important;height:auto!important;display:none!important;z-index:2000000000!important;background-color:transparent!important;cursor:auto!important;float:none!important;border-radius:unset!important;pointer-events:auto!important}#qw40JbA-1603449131003.open{animation : tawkMaxOpen .25s ease!important;}</style><style id="theia-sticky-sidebar-stylesheet-TSS">.theiaStickySidebar:after {content: ""; display: table; clear: both;}</style><script src="./Distributed Tracing_files/alfalfalfa.0823c767a3bc925f628afd9bed26c958.js" async="" charset="UTF-8"></script></head>
+<body class="is-article clickup-chrome-ext_installed" data-page="http://engineering.zalopay.vn" style="transform: none;" cz-shortcut-listen="true">
+
+    <header class="header u-sizeFullWidth u-bgColor">
+    <div class="header-wrap u-flexCenter u-relative">
+
+        <a class="header-logo u-inlineBlock u-flex0" href="http://engineering.zalopay.vn/">
+            <span class="u-fontSizeLarge u-fontWeightBolder">ZaloPay Engineering</span>
+        </a>
+
+        <nav class="nav u-flex u-flex1 u-paddingLeft20 u-flexCenter u-hide-before-md"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="header-left u-flex0 u-flex u-flexEnd u-fontSize21">
+
+            
+            
+
+            <div class="followMe follow-more u-hide-before-md"></div>
+
+
+            <a href="https://engineering.zalopay.vn/distributed-tracing/#" class="follow-toggle u-relative u-fontSizeLarge u-hide u-hide-before-md i-more"></a>
+            <span class="header-line u-hide-before-md"></span>
+            <a href="https://engineering.zalopay.vn/distributed-tracing/#" class="search-toggle u-relative i-search"></a>
+            <a href="https://engineering.zalopay.vn/distributed-tracing/#" class="menu--toggle u-relative u-hide-after-md"><span></span><span></span><span></span></a>
+
+        </div>
+    </div>
+
+    <aside class="sideNav u-absolute0 u-hide-after-md u-bgColor">
+    <div class="sideNav-wrap u-absolute0">
+        <nav class="sideNav-menu"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="sideNav-follow followMe u-fontSize20 u-paddingTop20 u-paddingLeft20 u-paddingRight20">
+            
+            
+        </div>
+    </div>
+</aside>
+
+</header>
+
+    <main class="main u-relative" style="transform: none;">
+<section class="post extreme-container u-marginTop30 u-marginBottom40" style="transform: none;">
+    <div class="row" style="transform: none;">
+        
+        <div class="col-left" style="transform: none;">
+            
+<div class="post-header">
+    
+        <div class="post-primary-tag u-marginBottom10 u-hide u-fontWeightBolder cover-category">
+            <a href="https://engineering.zalopay.vn/tag/skywalking/" title="Skywalking">Skywalking</a>
+        </div>
+    
+
+    <h1 class="post-title u-fontSize40 u-contentTitle u-md-fontSizeLarger">Distributed Tracing</h1>
+
+</div>
+
+
+            
+<div class="post-author u-flex u-flexCenter u-marginTop20">
+    <div class="u-flex0">
+        <a href="https://engineering.zalopay.vn/author/nambd2/" style="background-image:url()" class="avatar-image avatar-image--smaller u-backgroundSizeCover u-relative no-avatar"></a>
+    </div>
+
+    <div class="u-paddingLeft15 u-textColorNormal u-flex1 u-fontSizeSmaller u-lineHeight1">
+
+        <div class="u-block">
+            <time class="datetime" datetime=" 2020-03-03 ">Published 8 months ago</time>
+            <span class="point">—</span>
+            <span class="readingTime">9 min read</span>
+        </div>
+
+
+        <div class="u-block u-paddingTop5">
+            By <a href="https://engineering.zalopay.vn/author/nambd2/" class="mapache-tracking link link--underline u-fontWeightBold u-textColorDarker" title="Posts by Bành Đại Nam" data-event-category="Article" data-event-action="Author - Bành Đại Nam" data-event-label="Profile" data-event-non-interaction="1">Bành Đại Nam</a>
+
+            
+            
+        </div>
+
+    </div>
+</div>
+
+
+
+                <figure class="post-image u-block u-marginAuto u-maxWidth1000">
+                    <img src="./Distributed Tracing_files/distri.png" class="u-block u-marginAuto" alt="Distributed Tracing" data-action="zoom">
+                </figure>
+
+
+            
+<article class="post-body u-relative" style="transform: none;">
+    <div class="sharePost u-textAlignCenter u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+    
+    
+    
+    
+    
+    
+<div class="theiaStickySidebar" style="padding-top: 1px; padding-bottom: 1px; position: static; transform: none;"><a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share button--circle i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/distributed-tracing/"></a><a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share button--circle i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/distributed-tracing/" data-title="Distributed Tracing "></a><a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share button--circle i-reddit bg-reddit u-fontSize20" data-share="reddit" data-url="http://engineering.zalopay.vn/distributed-tracing/"></a><a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share button--circle i-linkedin bg-linkedin u-fontSize20" data-share="linkedin" data-url="http://engineering.zalopay.vn/distributed-tracing/"></a><a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share button--circle i-pinterest bg-pinterest u-fontSize20" data-share="pinterest" data-url="http://engineering.zalopay.vn/distributed-tracing/" data-title="Distributed Tracing"></a></div></div>
+
+    <div class="post-body-wrap">
+        <h2 id="tvn">Đặt vấn đề</h2>
+<p>Do sự ra đời của kiến trúc microservice, các service gọi lẫn nhau, đã dẫn đến một nhu cầu là: Làm thế nào để các nhà phát triển biết service nào đang chạy tốt, service nào đang gặp phải lỗi, độ trễ ở đâu là cao,... bên trong hệ thống, hoặc ở những hệ thống khác nhau. Do đó, chúng ta thường phải theo dõi flow của các request trong hệ thống.<br>
+Flow của request bắt đầu khi client gửi request đến hệ thống và kết thúc khi hệ thống không còn xử lý và trả về response. Kỹ thuật này được gọi là tracing.</p>
+<p>Các request trong microservice thường rất phức tạp. Ví dụ hệ thống quản lí tài xế sử dụng Notification Server để thông báo đến các bác tài đón những khách hàng. Phần giao diện (UI service) sẽ gọi đến những dịch vụ khác như là dịch vụ định vị vị trí khách hàng, dịch vụ thanh toán, tin nhắn, ... để lấy thông tin và hiển thị dữ liệu lên app của các tài xế. Việc theo dõi 1 flow request trên là một công việc không dễ dàng và mất nhiều thời gian. Lúc này, chúng ta có thể áp dụng kỹ thuật distributed tracing.</p>
+<h2 id="kintrcvcchhotng">Kiến trúc và cơ chế hoạt động:</h2>
+<h3 id="kintrc">Kiến trúc</h3>
+<p>Một hệ thống distributed client điều có các thành phần sau: bộ gửi sự kiện, bộ thu thập dấu vết, bộ lưu trữ (ghi lại dữ liệu và thể hiện mối quan hệ giữa chúng), hệ thống theo dõi và hiển thị.</p>
+<h3 id="cchhotng">Cơ chế hoạt động</h3>
+<p>Kỹ thuật distributed tracing có cơ chế hoạt động như sau:</p>
+<ul>
+<li>Service tiếp nhận request đầu tiên sẽ gán cho request một span ID (64/128bit) để định danh request đó.</li>
+<li>Các downstream của request đó sử dụng lại span ID đồng thời gắn thêm tag và log để nhận diện thứ tự cũng như sự kiện xảy ra tại thời điểm đó.</li>
+<li>Dữ liệu sẽ được hệ thống như Skywalking, Zipkin, Jaeger thu thập, xử lý và lưu lại trong RAM, mysql, TiDB,...</li>
+<li>Cuối cùng, phần UI sẽ đi query và hiển thị dữ liệu lên giao diện - đa phần là lên giao diện web.</li>
+</ul>
+<p>Thông qua distributed tracing, chúng ta có thể theo dõi flow của request dễ dàng hơn là việc ngồi trace log.</p>
+<h2 id="zipkinvjaeger">Zipkin và Jaeger.</h2>
+<p>Zipkin và Jaeger là hai sự lựa chọn phổ biến trong distributed tracing. Zipkin được lấy cảm hứng từ Dapper của Google và được phát triển bởi twitter. Jaeger được xây dựng và là mã nguồn mở của Uber. Jaeger cũng là một dự án của điện toán đám mây (Cloud Native Computing Foundation). Về kiến trúc tổng thể của Zipkin và Jaeger là tương tự nhau.<br>
+<img src="./Distributed Tracing_files/zipkin.png" alt="zipkin" data-action="zoom"><br>
+<img src="./Distributed Tracing_files/jaeger.png" alt="jaeger" data-action="zoom"></p>
+<h2 id="skywalkingngikthavphttrin">Skywalking - Người kế thừa và phát triển.</h2>
+<p>Vậy Skywalking đã phát triển ở điểm nào mà lọt vào mắt xanh của các ông lớn Trung Hoa như China Express Airlines, Huawei, Lenovo,Tencent,.... Câu trả lời, theo quan điểm cá nhân mình, là nằm ở lượng thông tin , cách thể hiện thông tin, và sự hỗ trợ lưu trữ mà chúng cung cấp.<br>
+Nếu như Zipkin chỉ cho chúng ta biết tên lớp, phương thức truy cập, địa chỉ IP, start time, end time, thời gian của một request .... thì Skywalking cung cấp cho chúng ta nhiều hơn thế. Ở Skywalking, chúng ta còn biết được service này chúng tốn bao nhiêu bộ nhớ, chúng có kết nối với DB hay message queue nào hay không, thời gian chúng kết nối là bao nhiêu,... Tất cả những thông tin đó điều được hiển thị lên Dashboard của skywalking UI.<br>
+<img src="./Distributed Tracing_files/trace_sky_2.png" alt="trace_sky_2" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/trace_sky_1.png" alt="trace_sky_1" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/trace_sky_4.png" alt="trace_sky_4" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/trace_sky_3.png" alt="trace_sky_3" data-action="zoom"></p>
+<p>Như vậy, ta có thể thấy rằng, lượng thông tin mà Skywalking cung cấp là vượt trội hơn nhiều so với Zipkin và Jaeger cung cấp. Tiếp theo, mình sẽ so sánh những gì mà Skywalking, Zipkin, Jaeger mang lại.</p>
+<h2 id="ssosnh">Sự so sánh</h2>
+<p>Sau đây là ma trận so sánh giữa ba hệ thống Skywalking, Zipkin, Jaeger.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Zipkin</th>
+<th>Jaeger</th>
+<th>Skywalking</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hỗ trợ ngôn ngữ</td>
+<td>Go, Java, Ruby, C++, scala, JS, LUA.</td>
+<td>Go, Java, Ruby, C++, Node, C#, Python, PHP, Rust.</td>
+<td>Java, .NET Core, NodeJS and PHP auto-instrument agents in SkyWalking format,Go, LUA, scala,</td>
+</tr>
+<tr>
+<td>Framework,library</td>
+<td>Spring,express,inagle,Rack. library (C#,go,java,ruby,scala,JS,php)</td>
+<td>Client library (go, java, node, python, c++, C#)</td>
+<td>Spring,express, Jetty, Netty, Play, library (C#, Go, Java, Ruby, Scala, JS, PHP)</td>
+</tr>
+<tr>
+<td>Storage Support</td>
+<td>In-memory, Cassandra, Elasticsearch, Mysql</td>
+<td>In-memory, Cassandra, Elasticsearch, InfluxDB.</td>
+<td>Elasticsearch, In memory, Mysql, TiDB, Sharding Sphere.</td>
+</tr>
+<tr>
+<td>Sampling</td>
+<td>Tùy chỉnh tỷ lệ sampling</td>
+<td>Tùy chỉnh tỷ lệ sampling</td>
+<td>Tùy chỉnh tỷ lệ sampling</td>
+</tr>
+<tr>
+<td>Span support</td>
+<td>Http, Kafka, Scribe, ActiveMQ, RabbitMQ, Redis</td>
+<td>Udp, Http, Kafka, ActiveMQ, RabbitMQ</td>
+<td>Grpc, Http, Kafka, ActiveMQ, RabbitMQ, Redis, RocketMQ.</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Có</td>
+<td>Có</td>
+<td>Có (non -office)</td>
+</tr>
+<tr>
+<td>Cộng đồng hộ trợ,blog</td>
+<td>Gitter chat, Github, Twitter, Medium</td>
+<td>Gitter chat, Github, Twitter, Medium</td>
+<td>Gitter chat, Github, Twitter, Medium</td>
+</tr>
+<tr>
+<td>Star (Github)</td>
+<td>12,5</td>
+<td>10,3</td>
+<td>12,3</td>
+</tr>
+<tr>
+<td>Issues(Github)</td>
+<td>251</td>
+<td>304</td>
+<td>88</td>
+</tr>
+<tr>
+<td>Các công ty,tập đoàn lớn sử dụng.</td>
+<td>Twitter , Google group -mail list, Gitter, Tokyo user group ,...</td>
+<td>Uber, các công ty tài chính ở Thượng Hải, Tencent, Red Hat</td>
+<td>China Express Airlines, Huawei, Lenovo, Tencent, Xiaomi, Alibaba Cloud,...</td>
+</tr>
+</tbody>
+</table>
+<p>Từ bản trên, ta có thể thấy rằng, hầu hết các ngôn ngữ, framework phổ biến điều<br>
+được hỗ trợ. Mặt khác, cộng đồng hỗ trợ của ba ứng dụng là đủ để hỗ trợ những<br>
+người mới và những issue được giải đáp thường xuyên.</p>
+<p>Sự khác biệt của Skywalking so với Zinkin và Jaeger nằm ở chỗ: Skywalking hỗ trợ nhiều nền tảng lưu trữ như TiDB và Sharing sphere.</p>
+<h2 id="benchmark">Benchmark</h2>
+<p>Mình sẽ dùng Apache Benchmark với số lượng request gửi lần lượt là 100, 1000 và 10000 request, mỗi lần gửi cùng lúc 8 request cho 4 trường hợp sau: gắn Skywalking client, Zipkin client, Jaeger client và ứng dụng chạy thông thường. Mình dùng Spring Boot kết nối với một MySQL DB đặt ở một server khác. Mình dùng lệnh ab với request path: /getAllUser.</p>
+<p><code>ab -n100 -c8 -k ‘http://localhost:3180/getAllUser'</code></p>
+<p>Trong kết quả trả về sau khi benchmark, mình chỉ tập trung so sánh thông số Request per second và nhận thấy kết quả như sau:</p>
+<table>
+<thead>
+<tr>
+<th>10K request</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>Normal</td>
+<td>Jaeger</td>
+<td>Skywalking</td>
+<td>Zipkin</td>
+</tr>
+<tr>
+<td></td>
+<td>2,433.05</td>
+<td>2,331.88</td>
+<td>1,758.98</td>
+<td>2,329.75</td>
+</tr>
+<tr>
+<td></td>
+<td>2,539.06</td>
+<td>2,335.38</td>
+<td>1,887.87</td>
+<td>2,484.75</td>
+</tr>
+<tr>
+<td></td>
+<td>2,847.27</td>
+<td>2,181.93</td>
+<td>1,996.01</td>
+<td>2,270.03</td>
+</tr>
+<tr>
+<td></td>
+<td>2,691.30</td>
+<td>2,453.89</td>
+<td>2,221.63</td>
+<td>2,339.84</td>
+</tr>
+<tr>
+<td></td>
+<td>2,434.13</td>
+<td>2,165.71</td>
+<td>2,200.70</td>
+<td>2,433.21</td>
+</tr>
+<tr>
+<td></td>
+<td>2,494.88</td>
+<td>2,386.03</td>
+<td>2,321.25</td>
+<td>2,286.24</td>
+</tr>
+<tr>
+<td></td>
+<td>2,848.10</td>
+<td>2,437.05</td>
+<td>2,299.80</td>
+<td>2,258.90</td>
+</tr>
+<tr>
+<td></td>
+<td>2,458.89</td>
+<td>2,424.63</td>
+<td>2,120.74</td>
+<td>2,208.24</td>
+</tr>
+<tr>
+<td></td>
+<td>2,564.14</td>
+<td>2,223.68</td>
+<td>2,307.31</td>
+<td>2,243.65</td>
+</tr>
+<tr>
+<td></td>
+<td>2,478.11</td>
+<td>2,217.03</td>
+<td>2,107.42</td>
+<td>2,262.63</td>
+</tr>
+<tr>
+<td>Trung bình</td>
+<td>2,578.89</td>
+<td>2,315.72</td>
+<td>2,122.17</td>
+<td>2,311.72</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1k request</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>Normal</td>
+<td>jaeger</td>
+<td>Skywalking</td>
+<td>Zipkin</td>
+</tr>
+<tr>
+<td></td>
+<td>2,341.91</td>
+<td>1,644.92</td>
+<td>1,827.36</td>
+<td>2,457.86</td>
+</tr>
+<tr>
+<td></td>
+<td>1,977.05</td>
+<td>1,673.70</td>
+<td>1,884.15</td>
+<td>2,217.14</td>
+</tr>
+<tr>
+<td></td>
+<td>2,320.49</td>
+<td>1,806.45</td>
+<td>1,871.28</td>
+<td>2,146.39</td>
+</tr>
+<tr>
+<td></td>
+<td>2,360.83</td>
+<td>1,800.96</td>
+<td>1,696.74</td>
+<td>2,061.79</td>
+</tr>
+<tr>
+<td></td>
+<td>2,456.50</td>
+<td>1,880.28</td>
+<td>1,770.06</td>
+<td>1,879.56</td>
+</tr>
+<tr>
+<td></td>
+<td>2,151.13</td>
+<td>1,921.14</td>
+<td>1,773.85</td>
+<td>2,094.48</td>
+</tr>
+<tr>
+<td></td>
+<td>2,388.42</td>
+<td>1,952.53</td>
+<td>1,972.60</td>
+<td>2,055.95</td>
+</tr>
+<tr>
+<td></td>
+<td>2,420.24</td>
+<td>1,891.63</td>
+<td>2,032.34</td>
+<td>2,033.98</td>
+</tr>
+<tr>
+<td></td>
+<td>2,555.37</td>
+<td>1,954.36</td>
+<td>2,091.34</td>
+<td>2,038.78</td>
+</tr>
+<tr>
+<td></td>
+<td>2,610.37</td>
+<td>1,912.26</td>
+<td>2,079.52</td>
+<td>2,224.03</td>
+</tr>
+<tr>
+<td>Trung bình</td>
+<td>2,358.23</td>
+<td>1,843.82</td>
+<td>1,899.92</td>
+<td>2,121.00</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>100 request</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>notmal</td>
+<td>Jaeger</td>
+<td>Skywalking</td>
+<td>Zipkin</td>
+</tr>
+<tr>
+<td></td>
+<td>1,516.19</td>
+<td>1,519.53</td>
+<td>1,566.66</td>
+<td>1,661.76</td>
+</tr>
+<tr>
+<td></td>
+<td>2,264.13</td>
+<td>1,744.65</td>
+<td>1,470.20</td>
+<td>2,197.66</td>
+</tr>
+<tr>
+<td></td>
+<td>2,742.36</td>
+<td>1,281.71</td>
+<td>1,592.48</td>
+<td>1,561.11</td>
+</tr>
+<tr>
+<td></td>
+<td>2,820.95</td>
+<td>1,430.33</td>
+<td>1,581.70</td>
+<td>1,628.74</td>
+</tr>
+<tr>
+<td></td>
+<td>2,220.74</td>
+<td>1,707.33</td>
+<td>1,543.52</td>
+<td>1,628.32</td>
+</tr>
+<tr>
+<td></td>
+<td>2,006.42</td>
+<td>1,653.93</td>
+<td>1,587.00</td>
+<td>1,515.77</td>
+</tr>
+<tr>
+<td></td>
+<td>2,130.70</td>
+<td>1,836.99</td>
+<td>1,563.80</td>
+<td>1,604.78</td>
+</tr>
+<tr>
+<td></td>
+<td>2,162.21</td>
+<td>1,528.68</td>
+<td>1,551.64</td>
+<td>1,645.36</td>
+</tr>
+<tr>
+<td></td>
+<td>2,128.57</td>
+<td>1,735.87</td>
+<td>1,605.08</td>
+<td>1,539.05</td>
+</tr>
+<tr>
+<td></td>
+<td>2,231.59</td>
+<td>1,422.68</td>
+<td>1,652.16</td>
+<td>1,576.81</td>
+</tr>
+<tr>
+<td>Trung bình</td>
+<td>2,222.39</td>
+<td>1,586.17</td>
+<td>1,571.42</td>
+<td>1,655.94</td>
+</tr>
+</tbody>
+</table>
+<p>Sau quá trình benchmark, mình nhận thấy rằng: việc gắn thêm skywalking client,<br>
+zipkin client, jaeger client không làm tăng độ trễ của ứng dụng lên quá cao.</p>
+<h2 id="mtsnhrequesttracingtrnhthngphntn">Một số ảnh request-tracing trên hệ thống phân tán.</h2>
+<h3 id="jaeger">Jaeger</h3>
+<p><img src="./Distributed Tracing_files/demo8.png" alt="demo8" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/demo7.png" alt="demo7" data-action="zoom"></p>
+<h3 id="zipkin">Zipkin</h3>
+<p><img src="./Distributed Tracing_files/demo6.png" alt="demo6" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/demo4.png" alt="demo4" data-action="zoom"></p>
+<h4 id="skywalking">Skywalking</h4>
+<p><img src="./Distributed Tracing_files/demo3.png" alt="demo3" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/demo2.png" alt="demo2" data-action="zoom"></p>
+<p><img src="./Distributed Tracing_files/demo1.png" alt="demo1" data-action="zoom"></p>
+<h2 id="ktlun">Kết luận</h2>
+<p>Với sự hỗ trợ tương thích cho hầu hết các ngôn ngữ và các hệ thống thu thập dữ liệu phổ biến, Skywalking, Zipkin, Jaeger hỗ trợ hầu hết cho các ứng dụng của bạn. Ban đầu, có vẻ như Zipkin đứng đầu, nhưng Jaeger và Skywalking có tiềm năng hơn nhiều vì nó hoạt động với bất kỳ thư viện thiết bị theo dõi mở nào. Jaeger cũng tương thích với API của Zipkin , vì vậy có thể sử dụng các thư viện thiết bị của Zipkin với trình thu thập của Jaeger. Jaeger đã nhận được sự chấp nhận tốt nhờ một số yếu tố, chẳng hạn như độ phủ ngôn ngữ tốt của các máy khách tương thích OpenTracing, bộ nhớ thấp và thiết kế hiện đại, có thể mở rộng, hỗ trợ nhiều nền tảng lưu trữ tốt hơn. Về phần Skywalking, tuy hoạt động chậm hơn nhưng xem được lượng thông tin lớn hơn.</p>
+
+
+        
+<div class="post-tags u-marginTop30">
+        <a href="http://engineering.zalopay.vn/tag/skywalking/" title="Skywalking" class="button tag-button">Skywalking</a>
+        <a href="http://engineering.zalopay.vn/tag/jaeger/" title="Jaeger" class="button tag-button">Jaeger</a>
+        <a href="http://engineering.zalopay.vn/tag/zipkin/" title="Zipkin" class="button tag-button">Zipkin</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-tracing/" title="Distributed Tracing" class="button tag-button">Distributed Tracing</a>
+</div>
+
+
+        <div class="row u-marginTop30 prev-next">
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/workflow-engines-and-their-use-in-enterprise-applications/" class="prev-next-link u-block u-marginBottom10">
+            <span class="prev-next-span u-block"><i class="i-arrow-round-prev u-fontSizeLarge arrow-left"></i> Prev article</span>
+            <h5 class="prev-next-title">Workflow engines and their use in enterprise applications</h5>
+        </a>
+    </div>
+
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/sonarqube/" class="prev-next-link u-block u-marginBottom10" style="text-align:right">
+            <span class="prev-next-span u-block">Next article <i class="i-arrow-round-next u-fontSizeLarge arrow-right"></i></span>
+            <h5 class="prev-next-title">SonarQube</h5>
+        </a>
+    </div>
+</div>
+
+        <div class="row mob-share u-marginTop30 u-hide-after-lg">
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/distributed-tracing/"> <span class="share-title">SHARE</span></a>
+    </div>
+
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/distributed-tracing/#" class="mapache-share i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/distributed-tracing/" data-title="Distributed Tracing "> <span class="share-title">TWEET</span></a>
+    </div>
+</div>
+
+        <hr class="post-footer-hr">
+
+        
+
+    </div>
+</article>
+
+
+
+<div class="post-comments-overlay u-absolute0 toggle-comments"></div>
+
+
+
+        </div>
+
+        <aside class="sidebar col-right sidebar-sticky u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+                
+
+    
+    
+
+
+
+    
+<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none;"><div class="sidebar-items u-marginBottom30 u-flexColumn">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Latest Articles</span></h3>
+
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">1</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Tìm hiểu API Gateway (Spring Cloud Gateway &amp; Zuul 2)</h3>
+        <a href="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">2</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Sử dụng RegEx để trích xuất OTP ngân hàng</h3>
+        <a href="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">3</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h3>
+        <a href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">4</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Hướng dẫn tích hợp gRPC-Web vào React JS app</h3>
+        <a href="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">5</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">OTP của VNG được sinh ra như thế nào?</h3>
+        <a href="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</div><div class="sidebar-items u-marginBottom30">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Tag Cloud</span></h3>
+
+        <a href="http://engineering.zalopay.vn/tag/distributed/" title="distributed" class="button tag-button">distributed</a>
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-system/" title="distributed system" class="button tag-button">distributed system</a>
+        <a href="http://engineering.zalopay.vn/tag/backend/" title="backend" class="button tag-button">backend</a>
+        <a href="http://engineering.zalopay.vn/tag/tidb/" title="TiDB" class="button tag-button">TiDB</a>
+        <a href="http://engineering.zalopay.vn/tag/raft/" title="raft" class="button tag-button">raft</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-database/" title="distributed database" class="button tag-button">distributed database</a>
+        <a href="http://engineering.zalopay.vn/tag/golang/" title="golang" class="button tag-button">golang</a>
+        <a href="http://engineering.zalopay.vn/tag/2pc/" title="2PC" class="button tag-button">2PC</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-transaction/" title="distributed transaction" class="button tag-button">distributed transaction</a>
+</div><div class="widget-twitter sidebar-items u-hide">
+        <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder">
+            <span class="u-paddingBottom10 u-inlineBlock">Recents Tweets</span>
+        </h3>
+    </div></div></aside>
+    </div>
+    
+<div id="disqus_thread"><iframe id="dsq-app4294" name="dsq-app4294" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./Distributed Tracing_files/saved_resource(1).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 395px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://https-engineering-zalopay-vn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+
+</section>
+
+
+
+
+<div class="instagram u-overflowHidden u-hide u-relative u-backgroundWhite">
+    <div class="instagram-wrap row"></div>
+    <span class="instagram-name u-absolute"></span>
+</div>
+</main>
+
+    <footer class="footer u-fontSizeSmaller u-fontWeightBold">
+    <div class="footer-links">
+
+        <div class="extreme-container u-flexCenter u-flexColumn">
+            <aside class="follow followMe u-textColorWhite u-fontSize20 u-textAlignCenter">
+                
+                
+                
+            </aside>
+
+            <ul class="footer-menu u-textUppercase u-textAlignCenter u-marginTop20 u-hide"></ul>
+        </div>
+
+
+    </div>
+
+    <div class="footer-copy u-textAlignCenter">
+        © 2020 <a href="http://engineering.zalopay.vn/">ZaloPay Engineering</a>
+        Design with <i class="i-favorite animated infinite pulse" style="color:red;display:inline-block"></i> by <a href="https://goo.gl/Jf1tZe" target="_blank" title="Developer FullStack.">@GodoFredoNinja</a>
+    </div>
+</footer>
+
+    <div class="search u-fixed">
+    <form class="search-form u-relative u-sizeFullWidth u-marginAuto u-marginBottom20">
+        <input id="search-field" class="u-sizeFullWidth u-md-fontSizeBase u-fontSize40 u-fontWeightSemibold" type="text" placeholder="Search...">
+    </form>
+
+    <div id="searchResults" class="search-results u-marginAuto u-sizeFullWidth"></div>
+</div>
+
+    <div class="loadingBar"></div>
+
+    
+
+    <script src="./Distributed Tracing_files/jquery.min.js"></script>
+
+    
+
+    <script src="./Distributed Tracing_files/main.js"></script>
+
+    
+<div id="fb-root"></div>
+
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://engineering.zalopay.vn/distributed-tracing/';
+        this.page.identifier = 'ghost-5e5e34f4e6b9c70001a0813d';
+    };
+
+    var $showComments = $('.post-comments-show');
+
+    (function(d, s, id) {
+        if (typeof disqusShortName !== 'undefined') {
+            $('.mapache-disqus').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js = d.createElement(s);
+            js.src = 'https://'+disqusShortName+'.disqus.com/embed.js';
+            js.async = true;
+
+            js.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(js);
+        } else if (typeof facebookLocaleComments !== 'undefined') {
+            $('.mapache-facebook').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://connect.facebook.net/'+facebookLocaleComments+'/sdk.js#xfbml=1&version=v3.1';
+            js.async = true;
+            fjs.parentNode.insertBefore(js, fjs);
+        } else {
+            $showComments.remove();
+        }
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+    <script>
+        Prism.plugins.autoloader.languages_path = 'http://engineering.zalopay.vn/assets/scripts/components/';
+        $('.post-body').find('pre').addClass('line-numbers');
+    </script>
+
+    <script>WebFontConfig ={google:{families:['Ruda:400,700,900','Merriweather:300,400,700','Fira+Mono:400']}};(function(){var wf=document.createElement('script');wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';wf.type='text/javascript';wf.async='true';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(wf,s);})();</script>
+
+
+<iframe style="display: none;" src="./Distributed Tracing_files/saved_resource(2).html"></iframe><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./Distributed Tracing_files/saved_resource(3).html"></iframe><div id="qma9iRn-1603449131002" class="" style="display: block !important;"><iframe id="qw40JbA-1603449131003" src="./Distributed Tracing_files/saved_resource(4).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; position: static !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 350px !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; display: none !important; height: 120px !important;"></iframe><iframe id="PmyIa9g-1603449131003" src="./Distributed Tracing_files/saved_resource(5).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; z-index: 1000001 !important; cursor: auto !important; float: none !important; pointer-events: auto !important; box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 10px 0px !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; width: 60px !important; min-width: 60px !important; max-width: 60px !important; border-radius: 50% !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; margin: 0px !important; top: auto !important; bottom: 20px !important; right: 20px !important; left: auto !important; display: block !important;"></iframe><iframe id="VHNaldJ-1603449131003" src="./Distributed Tracing_files/saved_resource(6).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; display: none !important; z-index: 1000003 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; top: auto !important; bottom: 60px !important; right: 15px !important; left: auto !important; width: 21px !important; max-width: 21px !important; min-width: 21px !important; height: 21px !important; max-height: 21px !important; min-height: 21px !important;"></iframe><iframe id="E5ewiYd-1603449131076" src="./Distributed Tracing_files/saved_resource(7).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; bottom: 30px !important; top: auto !important; right: 0px !important; left: auto !important; width: 124px !important; max-width: 124px !important; min-width: 124px !important; height: 95px !important; max-height: 95px !important; min-height: 95px !important; z-index: 1000002 !important; margin: 0px !important; display: none !important;"></iframe><div class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 100% !important; display: none !important; z-index: 1000001 !important; cursor: move !important; float: left !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="j7DAKRR-1603449131002" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 6px !important; height: 100% !important; display: block !important; z-index: 999998 !important; cursor: w-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="uZLTycx-1603449131002" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: 0px !important; bottom: auto !important; left: auto !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 6px !important; display: block !important; z-index: 999998 !important; cursor: n-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="dQmDWVw-1603449131003" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 12px !important; height: 12px !important; display: block !important; z-index: 999998 !important; cursor: nw-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><iframe id="VGDpv3x-1603449131602" src="./Distributed Tracing_files/saved_resource(8).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 378px !important; height: 876px !important; display: none !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; bottom: 100px !important; top: auto !important; right: 20px !important; left: auto !important;"></iframe></div><div id="eJOY__extension_root" class="eJOY__extension_root_class" style="all: unset;"></div></body></html>

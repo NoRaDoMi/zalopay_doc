@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/ -->
+<html lang="en" class="wf-ruda-n7-active wf-ruda-n9-active wf-merriweather-n7-active wf-merriweather-n4-active wf-firamono-n4-active wf-ruda-n4-active wf-merriweather-n3-active wf-active" style="transform: none;"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><style type="text/css" id="dark-mode-custom-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Sử dụng Git Rebase một cách hiệu quả</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" type="text/css" href="./Sử dụng Git Rebase một cách hiệu quả_files/main.css">
+
+    <link rel="shortcut icon" href="https://engineering.zalopay.vn/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/amp/">
+    
+    <meta property="og:site_name" content="ZaloPay Engineering">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Sử dụng Git Rebase một cách hiệu quả">
+    <meta property="og:description" content="Bài viết này chia sẻ cách sử dụng git rebase, một trong những công cụ mạnh mẽ mà Git cung cấp, để giải quyết các vấn đề thường ngày. Git Rebase đã giúp cuộc sống của tác giả dễ dàng hơn, git graph thẳng thớm hơn, qua đó giúp kiểm soát tốt hơn lịch sử của code base.">
+    <meta property="og:url" content="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/">
+    <meta property="og:image" content="http://engineering.zalopay.vn/content/images/2020/08/Screen-Shot-2020-08-01-at-17.00.20-copy-1.png">
+    <meta property="article:published_time" content="2020-08-01T09:26:35.000Z">
+    <meta property="article:modified_time" content="2020-08-05T11:10:39.000Z">
+    <meta property="article:tag" content="git">
+    <meta property="article:tag" content="rebase">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sử dụng Git Rebase một cách hiệu quả">
+    <meta name="twitter:description" content="Bài viết này chia sẻ cách sử dụng git rebase, một trong những công cụ mạnh mẽ mà Git cung cấp, để giải quyết các vấn đề thường ngày. Git Rebase đã giúp cuộc sống của tác giả dễ dàng hơn, git graph thẳng thớm hơn, qua đó giúp kiểm soát tốt hơn lịch sử của code base.">
+    <meta name="twitter:url" content="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/">
+    <meta name="twitter:image" content="http://engineering.zalopay.vn/content/images/2020/08/Screen-Shot-2020-08-01-at-17.00.20-copy-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Lê Thái Phúc Quang">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="git, rebase">
+    <meta property="og:image:width" content="1970">
+    <meta property="og:image:height" content="1254">
+    
+    <script type="text/javascript" async="" src="./Sử dụng Git Rebase một cách hiệu quả_files/analytics.js"></script><script src="./Sử dụng Git Rebase một cách hiệu quả_files/webfont.js" type="text/javascript" async=""></script><script async="" src="./Sử dụng Git Rebase một cách hiệu quả_files/default" charset="UTF-8" crossorigin="*"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ZaloPay Engineering",
+        "logo": "http://engineering.zalopay.vn/favicon.ico"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Lê Thái Phúc Quang",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://engineering.zalopay.vn/content/images/2020/05/DSCN44561.png",
+            "width": 1121,
+            "height": 1121
+        },
+        "url": "http://engineering.zalopay.vn/author/quangltp/",
+        "sameAs": []
+    },
+    "headline": "Sử dụng Git Rebase một cách hiệu quả",
+    "url": "http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/",
+    "datePublished": "2020-08-01T09:26:35.000Z",
+    "dateModified": "2020-08-05T11:10:39.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://engineering.zalopay.vn/content/images/2020/08/Screen-Shot-2020-08-01-at-17.00.20-copy-1.png",
+        "width": 1970,
+        "height": 1254
+    },
+    "keywords": "git, rebase",
+    "description": "Bài viết này chia sẻ cách sử dụng git rebase, một trong những công cụ mạnh mẽ mà Git cung cấp, để giải quyết các vấn đề thường ngày. Git Rebase đã giúp cuộc sống của tác giả dễ dàng hơn, git graph thẳng thớm hơn, qua đó giúp kiểm soát tốt hơn lịch sử của code base.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://engineering.zalopay.vn/"
+    }
+}
+    </script>
+
+    <script src="./Sử dụng Git Rebase một cách hiệu quả_files/ghost-sdk.min.js"></script>
+<script>
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "404c2ad841f6"
+});
+</script>
+    <meta name="generator" content="Ghost 2.9">
+    <link rel="alternate" type="application/rss+xml" title="ZaloPay Engineering" href="http://engineering.zalopay.vn/rss/">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./Sử dụng Git Rebase một cách hiệu quả_files/js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141214835-1');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e1d2d447e39ea1242a474e4/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<link rel="stylesheet" href="./Sử dụng Git Rebase một cách hiệu quả_files/css" media="all"><script src="./Sử dụng Git Rebase một cách hiệu quả_files/embed.js" data-timestamp="1603449053046"></script><link rel="prefetch" as="style" href="https://c.disquscdn.com/next/embed/styles/lounge.a8dc02def3107413d47189b1bce61bd9.css"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/common.bundle.847783fd9a0d1b9b80a706571a35d786.js"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/lounge.bundle.f86a840f3451e5487a277f1443585291.js"><link rel="prefetch" as="script" href="https://disqus.com/next/config.js"><style type="text/css">@keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-moz-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-webkit-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}#jX0v898-1603449053421{outline:none!important;visibility:visible!important;resize:none!important;box-shadow:none!important;overflow:visible!important;background:none!important;opacity:1!important;filter:alpha(opacity=100)!important;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity1)!important;-moz-opacity:1!important;-khtml-opacity:1!important;top:auto!important;right:10px!important;bottom:90px!important;left:auto!important;position:fixed!important;border:0!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;padding:0!important;margin:0!important;-moz-transition-property:none!important;-webkit-transition-property:none!important;-o-transition-property:none!important;transition-property:none!important;transform:none!important;-webkit-transform:none!important;-ms-transform:none!important;width:auto!important;height:auto!important;display:none!important;z-index:2000000000!important;background-color:transparent!important;cursor:auto!important;float:none!important;border-radius:unset!important;pointer-events:auto!important}#NnsLgYM-1603449053422.open{animation : tawkMaxOpen .25s ease!important;}</style><style id="theia-sticky-sidebar-stylesheet-TSS">.theiaStickySidebar:after {content: ""; display: table; clear: both;}</style><script src="./Sử dụng Git Rebase một cách hiệu quả_files/alfalfalfa.0823c767a3bc925f628afd9bed26c958.js" async="" charset="UTF-8"></script></head>
+<body class="is-article clickup-chrome-ext_installed" data-page="http://engineering.zalopay.vn" style="transform: none;" cz-shortcut-listen="true">
+
+    <header class="header u-sizeFullWidth u-bgColor">
+    <div class="header-wrap u-flexCenter u-relative">
+
+        <a class="header-logo u-inlineBlock u-flex0" href="http://engineering.zalopay.vn/">
+            <span class="u-fontSizeLarge u-fontWeightBolder">ZaloPay Engineering</span>
+        </a>
+
+        <nav class="nav u-flex u-flex1 u-paddingLeft20 u-flexCenter u-hide-before-md"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="header-left u-flex0 u-flex u-flexEnd u-fontSize21">
+
+            
+            
+
+            <div class="followMe follow-more u-hide-before-md"></div>
+
+
+            <a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="follow-toggle u-relative u-fontSizeLarge u-hide u-hide-before-md i-more"></a>
+            <span class="header-line u-hide-before-md"></span>
+            <a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="search-toggle u-relative i-search"></a>
+            <a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="menu--toggle u-relative u-hide-after-md"><span></span><span></span><span></span></a>
+
+        </div>
+    </div>
+
+    <aside class="sideNav u-absolute0 u-hide-after-md u-bgColor">
+    <div class="sideNav-wrap u-absolute0">
+        <nav class="sideNav-menu"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="sideNav-follow followMe u-fontSize20 u-paddingTop20 u-paddingLeft20 u-paddingRight20">
+            
+            
+        </div>
+    </div>
+</aside>
+
+</header>
+
+    <main class="main u-relative" style="transform: none;">
+<section class="post extreme-container u-marginTop30 u-marginBottom40" style="transform: none;">
+    <div class="row" style="transform: none;">
+        
+        <div class="col-left" style="transform: none;">
+            
+<div class="post-header">
+    
+        <div class="post-primary-tag u-marginBottom10 u-hide u-fontWeightBolder cover-category">
+            <a href="https://engineering.zalopay.vn/tag/git/" title="git">git</a>
+        </div>
+    
+
+    <h1 class="post-title u-fontSize40 u-contentTitle u-md-fontSizeLarger">Sử dụng Git Rebase một cách hiệu quả</h1>
+
+        <p class="post-excerpt u-fontSize20 u-paddingTop10">Bài viết này chia sẻ cách sử dụng git rebase, một trong những công cụ mạnh mẽ mà Git cung cấp, để giải quyết các vấn đề thường ngày. Git Rebase đã giúp cuộc sống của tác giả dễ dàng hơn, git graph thẳng thớm hơn, qua đó giúp kiểm soát tốt hơn lịch sử của code base.</p>
+</div>
+
+
+            
+<div class="post-author u-flex u-flexCenter u-marginTop20">
+    <div class="u-flex0">
+        <a href="https://engineering.zalopay.vn/author/quangltp/" style="background-image:url(/content/images/2020/05/DSCN44561.png)" class="avatar-image avatar-image--smaller u-backgroundSizeCover u-relative "></a>
+    </div>
+
+    <div class="u-paddingLeft15 u-textColorNormal u-flex1 u-fontSizeSmaller u-lineHeight1">
+
+        <div class="u-block">
+            <time class="datetime" datetime=" 2020-08-01 ">Published 3 months ago</time>
+            <span class="point">—</span>
+            <span class="readingTime">6 min read</span>
+        </div>
+
+
+        <div class="u-block u-paddingTop5">
+            By <a href="https://engineering.zalopay.vn/author/quangltp/" class="mapache-tracking link link--underline u-fontWeightBold u-textColorDarker" title="Posts by Lê Thái Phúc Quang" data-event-category="Article" data-event-action="Author - Lê Thái Phúc Quang" data-event-label="Profile" data-event-non-interaction="1">Lê Thái Phúc Quang</a>
+
+            
+            
+        </div>
+
+    </div>
+</div>
+
+
+
+                <figure class="post-image u-block u-marginAuto u-maxWidth1000">
+                    <img src="./Sử dụng Git Rebase một cách hiệu quả_files/Screen-Shot-2020-08-01-at-17.00.20-copy-1.png" class="u-block u-marginAuto" alt="Sử dụng Git Rebase một cách hiệu quả" data-action="zoom">
+                </figure>
+
+
+            
+<article class="post-body u-relative" style="transform: none;">
+    <div class="sharePost u-textAlignCenter u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+    
+    
+    
+    
+    
+    
+<div class="theiaStickySidebar" style="padding-top: 1px; padding-bottom: 1px; position: static; transform: none;"><a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share button--circle i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/"></a><a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share button--circle i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/" data-title="Sử dụng Git Rebase một cách hiệu quả "></a><a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share button--circle i-reddit bg-reddit u-fontSize20" data-share="reddit" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/"></a><a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share button--circle i-linkedin bg-linkedin u-fontSize20" data-share="linkedin" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/"></a><a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share button--circle i-pinterest bg-pinterest u-fontSize20" data-share="pinterest" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/" data-title="Sử dụng Git Rebase một cách hiệu quả"></a></div></div>
+
+    <div class="post-body-wrap">
+        <p>Bài viết này chia sẻ cách sử dụng <code>git rebase</code>, một trong những công cụ mạnh mẽ mà Git cung cấp, để giải quyết các vấn đề thường ngày. Git Rebase đã giúp cuộc sống của tác giả dễ dàng hơn, git graph thẳng thớm hơn, qua đó giúp kiểm soát tốt hơn lịch sử của code base.</p><p>Tác giả giả định bạn đã biết và đã từng xài Git, cũng như hiểu được một vài khái niệm cơ bản trong Git (commit, branch, remote,...).</p><h1 id="c-ph-p">Cú pháp</h1><p>Cú pháp tổng quát của <code>git rebase</code> như sau:</p><pre class="line-numbers"><code>git rebase --onto &lt;new_base&gt; &lt;current_base&gt; &lt;branch_to_rebase&gt;
+</code></pre><p>Câu lệnh sẽ được diễn dịch như sau: <strong>"Rebase <code>branch_to_rebase</code> lên trên <code>new_base</code>, nhưng chỉ những commit không nằm trong <code>current_base</code>"</strong>.</p><p>Giá trị mặc định:</p><ul><li><code>new_base</code> là tham số bắt buộc, lúc nào cũng phải có</li><li><code>current_base</code> là giá trị của <code>new_base</code></li><li><code>branch_to_rebase</code> là branch hiện tại</li></ul><p>Để dễ nhớ khi diễn dịch, chúng ta nên có thói quen checkout ra branch cần rebase trước khi thực hiện rebase:</p><pre class="line-numbers"><code>git checkout &lt;branch_to_rebase&gt;
+</code></pre><p>Như vậy, cú pháp bây giờ chỉ còn lại:</p><pre class="line-numbers"><code>git rebase --onto &lt;new_base&gt; &lt;current_base&gt;
+</code></pre><p>Diễn dịch: <strong>"Rebase branch hiện tại lên trên <code>new_base</code>, nhưng chỉ những commit không nằm trong <code>current_base</code>"</strong>.</p><p>Ngoài ra, <code>new_base</code> và <code>current_base</code> không nhất thiết phải là branch, mà có thể là một ref bất kì: tag, commit hash, ...</p><h1 id="rebase-m-t-tham-s-">Rebase một tham số</h1><p>Ở phiên bản đơn giản nhất, câu lệnh <code>git rebase</code> chỉ cần một tham số:</p><pre class="line-numbers"><code>git rebase &lt;new_base&gt;
+</code></pre><p>Câu này tương đương với câu lệnh đầy đủ:</p><pre class="line-numbers"><code>git rebase --onto &lt;new_base&gt; &lt;new_base&gt;
+</code></pre><p>Diễn dịch: <strong>"Rebase branch hiện tại lên trên <code>new_base</code>, nhưng chỉ những commit không nằm trong <code>new_base</code>"</strong>.</p><p>Hơi rắc rối phải không, đừng lo, hãy xem qua một vài ví dụ.</p><h2 id="v-d-">Ví dụ</h2><h3 id="rebase-r-nh-nh">Rebase rẽ nhánh</h3><p>Trăm nghe không bằng một thấy:</p><pre class="line-numbers"><code>A--B--C--D--E   [master]
+    \
+      F--G--H   [feature]
+</code></pre><p>Hiện tại, branch <code>master</code> và branch <code>feature</code> đang rẽ theo 2 đường khác nhau. Nếu ta checkout <code>feature</code> và rebase lên trên <code>master</code>:</p><pre class="line-numbers"><code>git checkout feature
+git rebase master
+</code></pre><p>Graph sẽ trở thành như sau:</p><pre class="line-numbers"><code>A--B--C--D--E               [master]
+             \
+               F'--G'--H'   [feature]
+</code></pre><p>Như vậy, Git đã thực hiện đúng như câu lệnh:</p><pre class="line-numbers"><code>git rebase --onto master master
+</code></pre><p><strong>"Rebase branch hiện tại lên trên <code>master</code>, nhưng chỉ những commit không nằm trong <code>master</code> (F, G, H)"</strong>.</p><p>Lúc này thì <code>feature</code> và <code>master</code> đã thẳng hàng.</p><h3 id="rebase-th-ng-h-ng">Rebase thẳng hàng</h3><p>Nếu ta tiếp tục checkout <code>master</code> và rebase lên trên <code>feature</code>:</p><pre class="line-numbers"><code>git checkout master
+git rebase feature
+</code></pre><p>Git sẽ lại tiếp tục thực hiện:</p><pre class="line-numbers"><code>git rebase --onto feature feature
+</code></pre><p><strong>"Rebase branch hiện tại lên trên <code>feature</code>, nhưng chỉ những commit không nằm trong <code>feature</code> (không có cái nào cả)"</strong>.</p><p>Bởi vì không có commit nào thỏa yêu cầu, nên Git chỉ đơn giản trỏ <code>master</code> đến cùng commit với commit <code>feature</code> đang trỏ. Kết quả:</p><pre class="line-numbers"><code>A--B--C--D--E
+             \
+               F'--G'--H'   [master][feature]
+</code></pre><h2 id="x-l-conflict">Xử lý conflict</h2><p>Khi thực hiện rebase, các commit sẽ được đưa lên trên đầu <code>new_base</code> <strong>từng commit một</strong>. Trong quá trình đó, nếu commit nào bị conflict, thì chúng ta sẽ phải giải quyết conflict, sau đó mới được rebase tiếp.</p><p>Trong ví dụ trên, khi rebase <code>feature</code> lên trên <code>master</code>, nếu commit F có conflict, chúng ta sẽ giải quyết conflict của F với <code>master</code>, sau đó mới đến lượt G, rồi cuối cùng mới đến H.</p><h1 id="rebase-hai-tham-s-">Rebase hai tham số</h1><p>Nhắc lại (đỡ mất công bạn cuộn lên cuộn xuống), khi ta gõ lệnh:</p><pre class="line-numbers"><code>git rebase --onto &lt;new_base&gt; &lt;current_base&gt;
+</code></pre><p>Git sẽ <strong>"rebase branch hiện tại lên trên <code>new_base</code>, nhưng chỉ những commit không nằm trong <code>current_base</code>"</strong>.</p><p>Bình thường, nếu <code>git rebase</code> chỉ nhận một tham số, thì cũng chỉ thường thường bậc trung như bao câu lệnh khác. Nhưng khi có sự xuất hiện của tham số <code>--onto</code>, Git Rebase lúc này sẽ trở nên tiện lợi hơn bao giờ hết.</p><h2 id="-i-lu-n-v-o-v-d-">Đi luôn vào ví dụ</h2><pre class="line-numbers"><code>            M--N--O   [new_feature]
+          /
+A--B--C--D--E         [master]
+    \
+      F--G--H         [feature]
+</code></pre><p>Bây giờ, ngoài branch <code>feature</code>, chúng ta có thêm branch <code>new_feature</code> chứa một tính năng mới mà chúng ta cần.</p><p>Nếu chúng ta chỉ đơn giản rebase <code>new_feature</code> lên trên <code>feature</code>:</p><pre class="line-numbers"><code>git checkout new_feature
+git rebase feature
+</code></pre><p>Chúng ta sẽ có graph:</p><pre class="line-numbers"><code>A--B--C--D--E                       [master]
+    \
+      F--G--H                       [feature]
+             \
+               C'--D'--M'--N'--O'   [new_feature]
+</code></pre><p>Rõ ràng là chưa đúng, vì chúng ta chỉ cần mang các commit M, N, O của <code>new_feature</code> vào <code>feature</code>, nhưng lúc này lại "dính" thêm các commit C, D của <code>master</code> nữa. (Tại sao lại thế? Bạn trả lời thử nhé).</p><p>Bây giờ xé nháp, reset lại lúc chưa rebase:</p><pre class="line-numbers"><code>            M--N--O   [new_feature]
+          /
+A--B--C--D--E         [master]
+    \
+      F--G--H         [feature]
+</code></pre><p>Để mang <code>new_feature</code> vào <code>feature</code>, ta thực hiện:</p><pre class="line-numbers"><code>git checkout new_feature
+git rebase --onto feature master
+</code></pre><p>Khi đó Git sẽ <strong>"rebase branch hiện tại lên trên <code>feature</code>, nhưng chỉ những commit không nằm trong <code>master</code> (M, N, O)"</strong>.</p><p>Graph lúc này trở thành:</p><pre class="line-numbers"><code>A--B--C--D--E               [master]
+    \
+      F--G--H               [feature]
+             \
+               M'--N'--O'   [new_feature]
+</code></pre><p>Nhưng đến đây, <code>feature</code> đã có những tính năng của <code>new_feature</code> chưa ạ? Xin thưa là chưa, chúng ta cần thêm một động tác nữa:</p><pre class="line-numbers"><code>git checkout feature
+git rebase new_feature
+</code></pre><p>Khi đó, <code>feature</code> mới có được những tính năng của <code>new_feature</code></p><pre class="line-numbers"><code>A--B--C--D--E               [master]
+    \
+      F--G--H               
+             \
+               M'--N'--O'   [feature][new_feature]
+</code></pre><h1 id="rebase-v-i-commit-l-p">Rebase với commit lặp</h1><p>Phần này các bạn chỉ cần đọc cho biết, không có gì cần ghi nhớ cả. Giả sử chúng ta có graph:</p><pre class="line-numbers"><code>A--B--C--D--E            [master]
+    \
+      F--G--H            [feature]
+             \
+               M--N--O   [new_feature]
+</code></pre><p>Khi ta rebase <code>feature</code> lên trên <code>master</code>:</p><pre class="line-numbers"><code>git checkout feature
+git rebase master
+</code></pre><p>Graph sẽ trở thành:</p><pre class="line-numbers"><code>               F'--G'--H'   [feature]
+             /
+A--B--C--D--E               [master]
+    \
+      F--G--H--M--N--O      [new_feature]
+</code></pre><p>Lúc này, <code>feature</code> đã có những commit mới nhất của <code>master</code>. Nhưng sau đó, chúng ta cần mang cả <code>new_feature</code> lên trên <code>feature</code> nữa.</p><p>Theo những gì đã trao đổi nãy giờ, chúng ta có thể thực hiện như sau:</p><pre class="line-numbers"><code>git checkout new_feature
+git rebase --onto feature HEAD~3
+</code></pre><p>Nhưng nếu chúng ta muốn <em>thử vận may</em>, chúng ta có thể chỉ cần đơn giản:</p><pre class="line-numbers"><code>git checkout new_feature
+git rebase feature
+</code></pre><p>Khi đó, Git sẽ mang cả 6 commit của <code>new_feature</code> (F ~ O) lên trên <code>feature</code>, nhưng sẽ <strong>tự động bỏ qua các commit có changes giống nhau</strong>, bằng cách so sánh <a href="https://git-scm.com/docs/git-patch-id">patch-id</a> của các commit.</p><p>Ở đây, nếu F có changes giống F', G giống G', H giống H', thì cuối cùng chỉ có 3 commit M, N, O được mang lên trên <code>feature</code>:</p><pre class="line-numbers"><code>                           M'--N'--O'   [new_feature]
+                         /
+               F'--G'--H'               [feature]
+             /
+A--B--C--D--E                           [master]
+</code></pre><p><strong>Nhưng nếu không may mắn?</strong></p><p>Trong trường hợp không may, các cặp F-F' G-G' H-H' có changes khác nhau (xảy ra khi rebase <code>feature</code> lên trên <code>master</code> trước đó), thì khi rebase <code>new_feature</code> lên trên <code>feature</code>, bạn sẽ phải một lần nữa giải quyết các conflict của F, G, H.</p><h1 id="k-t">Kết</h1><p>Bất cứ gì cũng vậy, nếu chúng ta muốn sử dụng những thứ mạnh mẽ, thì đều cần phải hiểu nó thật rõ.</p><p>Bài viết đã giới thiệu cho các bạn phần nào khả năng của Git Rebase, rebase với một tham số và hai tham số, rebase khi có commit lặp.</p><p>Git Rebase đã giúp cuộc sống của mình dễ dàng hơn, git tree của code base thẳng thớm hơn. Hy vọng bạn cũng đúc kết được những điều đáng nhớ cho riêng mình.</p><p>Chúc các bạn may mắn, YOLO!</p>
+
+        
+<div class="post-tags u-marginTop30">
+        <a href="http://engineering.zalopay.vn/tag/git/" title="git" class="button tag-button">git</a>
+        <a href="http://engineering.zalopay.vn/tag/rebase/" title="rebase" class="button tag-button">rebase</a>
+</div>
+
+
+        <div class="row u-marginTop30 prev-next">
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/spring-batch-framework-xu-ly-bo-gon-nhe-va-toan-dien/" class="prev-next-link u-block u-marginBottom10">
+            <span class="prev-next-span u-block"><i class="i-arrow-round-prev u-fontSizeLarge arrow-left"></i> Prev article</span>
+            <h5 class="prev-next-title">Spring Batch - Framework xử lý bó gọn nhẹ và toàn diện</h5>
+        </a>
+    </div>
+
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="prev-next-link u-block u-marginBottom10" style="text-align:right">
+            <span class="prev-next-span u-block">Next article <i class="i-arrow-round-next u-fontSizeLarge arrow-right"></i></span>
+            <h5 class="prev-next-title">OTP của VNG được sinh ra như thế nào?</h5>
+        </a>
+    </div>
+</div>
+
+        <div class="row mob-share u-marginTop30 u-hide-after-lg">
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/"> <span class="share-title">SHARE</span></a>
+    </div>
+
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/#" class="mapache-share i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/" data-title="Sử dụng Git Rebase một cách hiệu quả "> <span class="share-title">TWEET</span></a>
+    </div>
+</div>
+
+        <hr class="post-footer-hr">
+
+        
+
+    </div>
+</article>
+
+
+
+<div class="post-comments-overlay u-absolute0 toggle-comments"></div>
+
+
+
+        </div>
+
+        <aside class="sidebar col-right sidebar-sticky u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+                
+
+    
+    
+
+
+
+    
+<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none;"><div class="sidebar-items u-marginBottom30 u-flexColumn">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Latest Articles</span></h3>
+
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">1</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Tìm hiểu API Gateway (Spring Cloud Gateway &amp; Zuul 2)</h3>
+        <a href="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">2</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Sử dụng RegEx để trích xuất OTP ngân hàng</h3>
+        <a href="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">3</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h3>
+        <a href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">4</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Hướng dẫn tích hợp gRPC-Web vào React JS app</h3>
+        <a href="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">5</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">OTP của VNG được sinh ra như thế nào?</h3>
+        <a href="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</div><div class="sidebar-items u-marginBottom30">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Tag Cloud</span></h3>
+
+        <a href="http://engineering.zalopay.vn/tag/distributed/" title="distributed" class="button tag-button">distributed</a>
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-system/" title="distributed system" class="button tag-button">distributed system</a>
+        <a href="http://engineering.zalopay.vn/tag/backend/" title="backend" class="button tag-button">backend</a>
+        <a href="http://engineering.zalopay.vn/tag/tidb/" title="TiDB" class="button tag-button">TiDB</a>
+        <a href="http://engineering.zalopay.vn/tag/raft/" title="raft" class="button tag-button">raft</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-database/" title="distributed database" class="button tag-button">distributed database</a>
+        <a href="http://engineering.zalopay.vn/tag/golang/" title="golang" class="button tag-button">golang</a>
+        <a href="http://engineering.zalopay.vn/tag/2pc/" title="2PC" class="button tag-button">2PC</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-transaction/" title="distributed transaction" class="button tag-button">distributed transaction</a>
+</div><div class="widget-twitter sidebar-items u-hide">
+        <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder">
+            <span class="u-paddingBottom10 u-inlineBlock">Recents Tweets</span>
+        </h3>
+    </div></div></aside>
+    </div>
+    
+<div id="disqus_thread"><iframe id="dsq-app4744" name="dsq-app4744" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(1).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 395px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://https-engineering-zalopay-vn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+
+</section>
+
+
+
+
+<div class="instagram u-overflowHidden u-hide u-relative u-backgroundWhite">
+    <div class="instagram-wrap row"></div>
+    <span class="instagram-name u-absolute"></span>
+</div>
+</main>
+
+    <footer class="footer u-fontSizeSmaller u-fontWeightBold">
+    <div class="footer-links">
+
+        <div class="extreme-container u-flexCenter u-flexColumn">
+            <aside class="follow followMe u-textColorWhite u-fontSize20 u-textAlignCenter">
+                
+                
+                
+            </aside>
+
+            <ul class="footer-menu u-textUppercase u-textAlignCenter u-marginTop20 u-hide"></ul>
+        </div>
+
+
+    </div>
+
+    <div class="footer-copy u-textAlignCenter">
+        © 2020 <a href="http://engineering.zalopay.vn/">ZaloPay Engineering</a>
+        Design with <i class="i-favorite animated infinite pulse" style="color:red;display:inline-block"></i> by <a href="https://goo.gl/Jf1tZe" target="_blank" title="Developer FullStack.">@GodoFredoNinja</a>
+    </div>
+</footer>
+
+    <div class="search u-fixed">
+    <form class="search-form u-relative u-sizeFullWidth u-marginAuto u-marginBottom20">
+        <input id="search-field" class="u-sizeFullWidth u-md-fontSizeBase u-fontSize40 u-fontWeightSemibold" type="text" placeholder="Search...">
+    </form>
+
+    <div id="searchResults" class="search-results u-marginAuto u-sizeFullWidth"></div>
+</div>
+
+    <div class="loadingBar"></div>
+
+    
+
+    <script src="./Sử dụng Git Rebase một cách hiệu quả_files/jquery.min.js"></script>
+
+    
+
+    <script src="./Sử dụng Git Rebase một cách hiệu quả_files/main.js"></script>
+
+    
+<div id="fb-root"></div>
+
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://engineering.zalopay.vn/su-dung-git-rebase-mot-cach-hieu-qua/';
+        this.page.identifier = 'ghost-5f2533da25669300012f2a83';
+    };
+
+    var $showComments = $('.post-comments-show');
+
+    (function(d, s, id) {
+        if (typeof disqusShortName !== 'undefined') {
+            $('.mapache-disqus').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js = d.createElement(s);
+            js.src = 'https://'+disqusShortName+'.disqus.com/embed.js';
+            js.async = true;
+
+            js.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(js);
+        } else if (typeof facebookLocaleComments !== 'undefined') {
+            $('.mapache-facebook').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://connect.facebook.net/'+facebookLocaleComments+'/sdk.js#xfbml=1&version=v3.1';
+            js.async = true;
+            fjs.parentNode.insertBefore(js, fjs);
+        } else {
+            $showComments.remove();
+        }
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+    <script>
+        Prism.plugins.autoloader.languages_path = 'http://engineering.zalopay.vn/assets/scripts/components/';
+        $('.post-body').find('pre').addClass('line-numbers');
+    </script>
+
+    <script>WebFontConfig ={google:{families:['Ruda:400,700,900','Merriweather:300,400,700','Fira+Mono:400']}};(function(){var wf=document.createElement('script');wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';wf.type='text/javascript';wf.async='true';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(wf,s);})();</script>
+
+
+<iframe style="display: none;" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(2).html"></iframe><div id="jX0v898-1603449053421" class="" style="display: block !important;"><iframe id="NnsLgYM-1603449053422" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(3).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; position: static !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 350px !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; display: none !important; height: 120px !important;"></iframe><iframe id="hNskmuW-1603449053422" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(4).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; z-index: 1000001 !important; cursor: auto !important; float: none !important; pointer-events: auto !important; box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 10px 0px !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; width: 60px !important; min-width: 60px !important; max-width: 60px !important; border-radius: 50% !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; margin: 0px !important; top: auto !important; bottom: 20px !important; right: 20px !important; left: auto !important; display: block !important;"></iframe><iframe id="PT1OW5L-1603449053422" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(5).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; display: none !important; z-index: 1000003 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; top: auto !important; bottom: 60px !important; right: 15px !important; left: auto !important; width: 21px !important; max-width: 21px !important; min-width: 21px !important; height: 21px !important; max-height: 21px !important; min-height: 21px !important;"></iframe><iframe id="As8lEmd-1603449053582" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(6).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; bottom: 30px !important; top: auto !important; right: 0px !important; left: auto !important; width: 124px !important; max-width: 124px !important; min-width: 124px !important; height: 95px !important; max-height: 95px !important; min-height: 95px !important; z-index: 1000002 !important; margin: 0px !important; display: none !important;"></iframe><div class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 100% !important; display: none !important; z-index: 1000001 !important; cursor: move !important; float: left !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="DEePsHZ-1603449053421" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 6px !important; height: 100% !important; display: block !important; z-index: 999998 !important; cursor: w-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="ILfkiGr-1603449053421" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: 0px !important; bottom: auto !important; left: auto !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 6px !important; display: block !important; z-index: 999998 !important; cursor: n-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="dPcRT04-1603449053421" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 12px !important; height: 12px !important; display: block !important; z-index: 999998 !important; cursor: nw-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><iframe id="bTaSiSh-1603449053840" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(7).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 378px !important; height: 876px !important; display: none !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; bottom: 100px !important; top: auto !important; right: 20px !important; left: auto !important;"></iframe></div><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./Sử dụng Git Rebase một cách hiệu quả_files/saved_resource(8).html"></iframe><div id="eJOY__extension_root" class="eJOY__extension_root_class" style="all: unset;"></div></body></html>

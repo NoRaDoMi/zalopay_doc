@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)https://engineering.zalopay.vn/java-garbage-collector-examination/ -->
+<html lang="en" class="wf-ruda-n7-active wf-ruda-n9-active wf-merriweather-n7-active wf-merriweather-n4-active wf-ruda-n4-active wf-merriweather-n3-active wf-firamono-n4-active wf-active" style="transform: none;"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><style type="text/css" id="dark-mode-custom-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>A Java Garbage Collector examination</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" type="text/css" href="./A Java Garbage Collector examination_files/main.css">
+
+    <link rel="shortcut icon" href="https://engineering.zalopay.vn/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="http://engineering.zalopay.vn/java-garbage-collector-examination/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://engineering.zalopay.vn/java-garbage-collector-examination/amp/">
+    
+    <meta property="og:site_name" content="ZaloPay Engineering">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="A Java Garbage Collector examination">
+    <meta property="og:description" content="In software development, performance concerns have always been one of the top topics in discussions. Not only because it&#39;s vital to the system itself, but it also directly affects end-user experience as well.  In this topic today, we focus on java applications and GC (garbage collector) tuning, as a way">
+    <meta property="og:url" content="http://engineering.zalopay.vn/java-garbage-collector-examination/">
+    <meta property="og:image" content="http://engineering.zalopay.vn/content/images/2020/05/java-garbage-collector-types.png">
+    <meta property="article:published_time" content="2020-05-18T06:05:55.000Z">
+    <meta property="article:modified_time" content="2020-05-18T06:07:30.000Z">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="A Java Garbage Collector examination">
+    <meta name="twitter:description" content="In software development, performance concerns have always been one of the top topics in discussions. Not only because it&#39;s vital to the system itself, but it also directly affects end-user experience as well.  In this topic today, we focus on java applications and GC (garbage collector) tuning, as a way">
+    <meta name="twitter:url" content="http://engineering.zalopay.vn/java-garbage-collector-examination/">
+    <meta name="twitter:image" content="http://engineering.zalopay.vn/content/images/2020/05/java-garbage-collector-types.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Nguyễn Khôi Nguyên">
+    <meta property="og:image:width" content="768">
+    <meta property="og:image:height" content="469">
+    
+    <script type="text/javascript" async="" src="./A Java Garbage Collector examination_files/analytics.js"></script><script src="./A Java Garbage Collector examination_files/webfont.js" type="text/javascript" async=""></script><script async="" src="./A Java Garbage Collector examination_files/default" charset="UTF-8" crossorigin="*"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ZaloPay Engineering",
+        "logo": "http://engineering.zalopay.vn/favicon.ico"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Nguyễn Khôi Nguyên",
+        "url": "http://engineering.zalopay.vn/author/nguyen-khoi-nguyen/",
+        "sameAs": []
+    },
+    "headline": "A Java Garbage Collector examination",
+    "url": "http://engineering.zalopay.vn/java-garbage-collector-examination/",
+    "datePublished": "2020-05-18T06:05:55.000Z",
+    "dateModified": "2020-05-18T06:07:30.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://engineering.zalopay.vn/content/images/2020/05/java-garbage-collector-types.png",
+        "width": 768,
+        "height": 469
+    },
+    "description": "In software development, performance concerns have always been one of the top topics in discussions. Not only because it&#x27;s vital to the system itself, but it also directly affects end-user experience as well.  In this topic today, we focus on java applications and GC (garbage collector) tuning, as a way",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://engineering.zalopay.vn/"
+    }
+}
+    </script>
+
+    <script src="./A Java Garbage Collector examination_files/ghost-sdk.min.js"></script>
+<script>
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "404c2ad841f6"
+});
+</script>
+    <meta name="generator" content="Ghost 2.9">
+    <link rel="alternate" type="application/rss+xml" title="ZaloPay Engineering" href="http://engineering.zalopay.vn/rss/">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./A Java Garbage Collector examination_files/js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141214835-1');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e1d2d447e39ea1242a474e4/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<link rel="stylesheet" href="./A Java Garbage Collector examination_files/css" media="all"><script src="./A Java Garbage Collector examination_files/embed.js" data-timestamp="1603449089054"></script><style type="text/css">@keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-moz-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-webkit-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}#Xhf7y1a-1603449089114{outline:none!important;visibility:visible!important;resize:none!important;box-shadow:none!important;overflow:visible!important;background:none!important;opacity:1!important;filter:alpha(opacity=100)!important;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity1)!important;-moz-opacity:1!important;-khtml-opacity:1!important;top:auto!important;right:10px!important;bottom:90px!important;left:auto!important;position:fixed!important;border:0!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;padding:0!important;margin:0!important;-moz-transition-property:none!important;-webkit-transition-property:none!important;-o-transition-property:none!important;transition-property:none!important;transform:none!important;-webkit-transform:none!important;-ms-transform:none!important;width:auto!important;height:auto!important;display:none!important;z-index:2000000000!important;background-color:transparent!important;cursor:auto!important;float:none!important;border-radius:unset!important;pointer-events:auto!important}#o7gfixH-1603449089115.open{animation : tawkMaxOpen .25s ease!important;}</style><link rel="prefetch" as="style" href="https://c.disquscdn.com/next/embed/styles/lounge.a8dc02def3107413d47189b1bce61bd9.css"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/common.bundle.847783fd9a0d1b9b80a706571a35d786.js"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/lounge.bundle.f86a840f3451e5487a277f1443585291.js"><link rel="prefetch" as="script" href="https://disqus.com/next/config.js"><style id="theia-sticky-sidebar-stylesheet-TSS">.theiaStickySidebar:after {content: ""; display: table; clear: both;}</style><script src="./A Java Garbage Collector examination_files/alfalfalfa.0823c767a3bc925f628afd9bed26c958.js" async="" charset="UTF-8"></script></head>
+<body class="is-article clickup-chrome-ext_installed" data-page="http://engineering.zalopay.vn" style="transform: none;" cz-shortcut-listen="true">
+
+    <header class="header u-sizeFullWidth u-bgColor">
+    <div class="header-wrap u-flexCenter u-relative">
+
+        <a class="header-logo u-inlineBlock u-flex0" href="http://engineering.zalopay.vn/">
+            <span class="u-fontSizeLarge u-fontWeightBolder">ZaloPay Engineering</span>
+        </a>
+
+        <nav class="nav u-flex u-flex1 u-paddingLeft20 u-flexCenter u-hide-before-md"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="header-left u-flex0 u-flex u-flexEnd u-fontSize21">
+
+            
+            
+
+            <div class="followMe follow-more u-hide-before-md"></div>
+
+
+            <a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="follow-toggle u-relative u-fontSizeLarge u-hide u-hide-before-md i-more"></a>
+            <span class="header-line u-hide-before-md"></span>
+            <a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="search-toggle u-relative i-search"></a>
+            <a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="menu--toggle u-relative u-hide-after-md"><span></span><span></span><span></span></a>
+
+        </div>
+    </div>
+
+    <aside class="sideNav u-absolute0 u-hide-after-md u-bgColor">
+    <div class="sideNav-wrap u-absolute0">
+        <nav class="sideNav-menu"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="sideNav-follow followMe u-fontSize20 u-paddingTop20 u-paddingLeft20 u-paddingRight20">
+            
+            
+        </div>
+    </div>
+</aside>
+
+</header>
+
+    <main class="main u-relative" style="transform: none;">
+<section class="post extreme-container u-marginTop30 u-marginBottom40" style="transform: none;">
+    <div class="row" style="transform: none;">
+        
+        <div class="col-left" style="transform: none;">
+            
+<div class="post-header">
+    
+
+    <h1 class="post-title u-fontSize40 u-contentTitle u-md-fontSizeLarger">A Java Garbage Collector examination</h1>
+
+</div>
+
+
+            
+<div class="post-author u-flex u-flexCenter u-marginTop20">
+    <div class="u-flex0">
+        <a href="https://engineering.zalopay.vn/author/nguyen-khoi-nguyen/" style="background-image:url()" class="avatar-image avatar-image--smaller u-backgroundSizeCover u-relative no-avatar"></a>
+    </div>
+
+    <div class="u-paddingLeft15 u-textColorNormal u-flex1 u-fontSizeSmaller u-lineHeight1">
+
+        <div class="u-block">
+            <time class="datetime" datetime=" 2020-05-18 ">Published 5 months ago</time>
+            <span class="point">—</span>
+            <span class="readingTime">12 min read</span>
+        </div>
+
+
+        <div class="u-block u-paddingTop5">
+            By <a href="https://engineering.zalopay.vn/author/nguyen-khoi-nguyen/" class="mapache-tracking link link--underline u-fontWeightBold u-textColorDarker" title="Posts by Nguyễn Khôi Nguyên" data-event-category="Article" data-event-action="Author - Nguyễn Khôi Nguyên" data-event-label="Profile" data-event-non-interaction="1">Nguyễn Khôi Nguyên</a>
+
+            
+            
+        </div>
+
+    </div>
+</div>
+
+
+
+                <figure class="post-image u-block u-marginAuto u-maxWidth1000">
+                    <img src="./A Java Garbage Collector examination_files/java-garbage-collector-types.png" class="u-block u-marginAuto" alt="A Java Garbage Collector examination" data-action="zoom">
+                </figure>
+
+
+            
+<article class="post-body u-relative" style="transform: none;">
+    <div class="sharePost u-textAlignCenter u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+    
+    
+    
+    
+    
+    
+<div class="theiaStickySidebar" style="padding-top: 1px; padding-bottom: 1px; position: static; transform: none; left: 335px; top: 0px;"><a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share button--circle i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/"></a><a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share button--circle i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/" data-title="A Java Garbage Collector examination "></a><a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share button--circle i-reddit bg-reddit u-fontSize20" data-share="reddit" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/"></a><a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share button--circle i-linkedin bg-linkedin u-fontSize20" data-share="linkedin" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/"></a><a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share button--circle i-pinterest bg-pinterest u-fontSize20" data-share="pinterest" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/" data-title="A Java Garbage Collector examination"></a></div></div>
+
+    <div class="post-body-wrap">
+        <p>In software development, performance concerns have always been one of the top topics in discussions. Not only because it's vital to the system itself, but it also directly affects end-user experience as well. &nbsp;</p><p>In this topic today, we focus on java applications and GC (garbage collector) tuning, as a way to make small and meaningful changes that can affect the system in big ways under certain circumstances. </p><h2 id="what-is-gc">What is GC?</h2><p><strong>GC</strong> or <strong>Garbage Collector</strong> is a form of automatic memory management in Java. &nbsp;</p><p>It allocates from and gives back memory to the operating system. The allocated memory will be given to our application when it is requested. The garbage collectors then determine whether the memory is still used after an amount of time and reclaim if necessary. </p><p>Everything above is done inside Heap, a space for dynamic memory allocation on runtime to contain all java Objects. Along with Heap, there is Stack that contains local variables and function call that support for thread executions.</p><p>GCs come with the JVM included in the JRE (or JDK) that we use for our java application. </p><h2 id="how-do-these-gcs-collect-back-unused-memory">How do these GCs collect back unused memory?</h2><p>Naively and purely theoretically, it would be to scan over all of the heap to see which object is live (referenced) and which is dead (not referenced to). All dead objects can then be cleared out and their memory returned to the system.</p><p>Obviously, the method above is slow and cumbersome so GCs don't actually do that. Instead it leverages <strong>generational collection</strong>, a method based on the <strong>Young/Weak Generational Hypothesis </strong>which states that <strong><em>most objects allocated don't get to live long and would survive for only a short period of time</em></strong>.</p><p>Take figure A.1 (courtesy of oracle) for example:</p><figure class="kg-card kg-image-card"><img src="data:image/png;base64,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" class="kg-image" data-action="zoom"></figure><p>The x axis shows object lifetime and the y axis shows the bytes surviving after the collections. </p><p>The sharp peak at the top left indicate objects that live shortly, typically objects that are created in a loop after we exit the loop. Some objects do live longer so the line stretches to the right side, instance objects, objects in static variables that live to the end of the application life cycle. </p><p>Based on this finding, the GC divides the heap into <strong>contiguous </strong>regions called <strong>generations</strong>. Each indicate the time they have lived in the system. After a region is full, a sweep called Garbage Collection will be invoked to scan the objects and move them to their right memory space. </p><h2 id="the-method">The method</h2><figure class="kg-card kg-image-card"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA1oAAAEcCAYAAADePMXGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAABkUSURBVHhe7d0JlBxFGQfwDiAQVA6RU4yJSjAgICQgaJTgA48gKMEDORQiREUUlYgH3gcoxuMhICohKngCHmAExSeHiDeHByqgqAgqoMbITcg4X233ZjPZ3STsl2Rn8/u915mZ6pnZne3qTP27uqpHtdoqAAAA0qxR3wIAAJBE0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkG9Vqq+93pVGjRtX3AACAkaLLY4oeLQAAgGwjpker2xMvrI7svywP9YXlob5A9xop+68eLQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSjWm31/a40atSoctvlH6Pr/OIXv6gefPDB+tHSbbrpptW4cePqR4P7z3/+U/385z+vNtxww2rXXXetSxmJsvffhQsXVhdddFH1u9/9rrrxxhurtddeu9S7nXfeuXrmM59ZP2v4ueuuu6rf/OY31VprrVVNnDixLqWT+tJDfVk22gfd47///W9pV/zsZz8r++PjH//46ilPeUq14447VmPHju3dlp1uv/326k9/+lNpL2yzzTZ16dJ973vfK7d77733gO/NqjVi9t/2B+hq8RFGwMfoOo985CN7//bLssyYMaN+5dJdeuml5TW77757XcJI1dSPDJdffnmr/aXc+56dS7vx3Gp/udbPHl7aDYzyO26wwQZ1SfeaPXt263nPe17r17/+dV2Sp9mWGdSXVafdMG6ddtpprcMPP7y1yy67tPbbb7/Wcccdl15nmm3J8PW///2vte+++7bajere7dW5PPGJT2xde+219SsW99nPfrY8J/7PWR7Ne9933311CcNNs426nR4tHpL111+/av8HWT3qUY+qRo8eXZcO7OCDD64+/OEP148Gd9lll1VTpkyp2kGruvLKK+tSRqKs/fe6666rJk2aVN1zzz1V+0u5etGLXlSNGTOmmjdvXvWHP/yh+uY3v1mOmK6zzjpVO8hXu+22W/3K4eGXv/xl+f3bDefyO3er2I4TJkwof/P4O++xxx71mhzqS49uri/RY/Hc5z63nLnQKf7eJ554YvXGN76xLhka7YPh7ZZbbqn22Wefqh2iyuPowYp6ve2225Z111xzTfWjH/2ouvfee6v11luvaoeq6qCDDirPbZxxxhnVkUceWbWDVvWd73ynLl26pm60g1bpyWb4GTH7b/sDdLX4CCPgY3SdpkfrvPPOq0vy6NFafWTtv0996lPL+7QbzK3777+/Ll3kL3/5S6v9BV6es9VWW9Wlw8fdd99djub/9re/rUu6T3yGdgO5d5vGfpytee+hUl9WjeiVWH/99cvfda+99mqde+65rRtuuKF1ySWXtKZOndq7fbPqTvN+DD+33npr2bdi+0SdOOuss+o1i/vVr37VmjBhQu+27HyeHq2Rq9lG3a7rP8FI2RDdRtAiQ8b+O3/+/N7TTv7617/WpUu68MILe3/en//857qUoZo5c2br2c9+9hKnEw/XoKW+rDrTp08vf8/Jkye37rnnnrq0x8KFC1tTpkzpXZ+h2X4MP29605vKtllrrbWWesroXXfd1Ro/fnx5/hOe8ITWggUL6jWC1kjWbKNuZ9ZBVpmbb765Ovnkk8upAC996Uur008/vWo3fOq1A7viiiuqt771rVW7cVdOF4hTTa666qp67eJmz55dHXvsseVUoQceeKD8jJe//OXV0572tGrGjBnVV7/61fqZdKsYON3+v6xaY401qkc/+tF16ZL22muvMrlKnNrWbjjXpT2DoqOOnH322XXJ4r773e+W9eeee25dUlV33HFHKYu6F37yk59UBxxwQKlX7QZ6Wffud7+7rOtPnBIbz3n/+99fHv/973+v3ve+91UnnXRSeRx19bjjjivPiVNnBvKe97ynPCdOx+or6nu7IVPtueeeVbthUk7PiZ9155131s9Y5Kc//Wl5j3POOac8/sIXvlD2rde//vXl8dLEPhV/wziVuK/mtI/hRn1ZdfUlPmt4xSteUa277rrlfiPqyytf+cpyP06NXJ7Jlugu//73v6tPf/rT5f6rX/3q6slPfnK5P5A4bbCp63/84x+rL33pS+X+0tx9993V5z73ufIz9t1330HbCrDClLjVxeIjjICP0XWG2qMVg7k322yz3u3XLDG4+4QTTij3O3u04ijW8ccf32o3kJZ4XZTNmjWrfuYiz3/+88v6OXPmtPbYY48lXhdLu8FSP5uVrdkGQ3H77bf3vs8nP/nJunTZtRuf5bUHHnhgXbK4d73rXWV93wld4nSnKItB2u2GdWvNNdcsj0ePHt264ooryv1YBjpSO23atLL+Va96VXnc3+QGcWpVlLUb5HXJ4uKUmlgfdf9vf/tbXdoqdb3dMCnrYll77bV77z/ucY8rv19fzRHhI444ovWOd7yj97nLeoT45ptvLj1DscQpd83rL7vssvoZeZr3Hgr1ZdXUlzhFs+lJvPrqq+vSxc2dO7esj+dFL8ZQNb8bw8vpp5/eu51jf1xW2267bXldO6jXJQP3aMX7NqcI913iZ5566qm9j/VoDV/NNup2erRY6eJobEx28c9//rOaPHlydfHFF1ftBlr1rW99qxxhfvvb314/c3FxxPeDH/xgtdFGG1VnnXVWeX1MyXzaaadVD3vYw6qZM2dWH/jAB+pnL+41r3lNOUp6yimnVDfddFMZfNsMqm03jKrf//735T7dJ+pM+wu13I+j6lOnTq3OPPPMUqdWtBjQH/Wo3SCt3vKWt1Sf+MQnqqc//emlVyD07dVoRM9PM2j78MMPL7f9iZ7XEL0AcWS201e+8pVyG70Jj3nMY8r9mEgm3jMmeTjhhBPKgPKYCjwulxC9FPE3efGLX1wmeuh06aWXlv0rfv/oLXnta19brxncVlttVT32sY8tS0woMdypL6umvkQPYjvsVe0wWW2//fZ16eJ+8IMflNuYoCR6MRiZbrjhhnIb9XCwXuVOTb2J6dyXJiZcid7X+BlR9+N7//LLLy/1f1n/b4MUdeDqWvERRsDH6DpNj1b7P8lWu3E16LL33nvXr+px7LHHltdGj1XnQPQ77rijteGGG5b1u+22W13aMzh93XXXLUeCr7rqqrp0kehZi9dssskmi71n06PVDmJLDBx/4IEHWptuumlZ/6lPfaouZWWKv30sQ9UO76W3oHm/Zokj8i972cvKEdR2I7d+9uKG0kMRy6677tpqN0TrNT3e+973lnXbbbddXbJIDOaOdU960pPqkv57KO68887WIx7xiFJ+zjnn1KWLxFiFWNduRJTHMcYlpsqOsvhMnWJMTPyusb4dMOrSRUeEYznqqKPK+wxF817DtUcrqC/Dp740Lr744jJeJ973ox/9aF06NM3vyfCy//77l+0SZ5ksj6YHte8ENf31aF1wwQWlLNopMelGXw8++OBiZ7fce++99RqGm2YbdTs9WgxJjD2IcVWDLdGD1ViwYEHvudnRkxQ9UX1tvPHG1dFHH10/WiTGgcQUr9OmTat22mmnunSRF7zgBeWChXHxwhgj0andeCpTxvYVF/uM6WTDbbfdVm7pTptvvnm5gGv0TLTDddVucJbyOCL/5S9/uZyjv+WWW1bTp08vRzYzzZo1q1zuoK9DDz20jDlph/slekubnoXBeifCwx/+8DKOJ3T2dLQb2mWsQvTuvvCFLyxlMfYgeiJiiuz+9qEYE9O8X/Qid4rPEOMg4vce6dSX4VNfYnrtOFshxtvG90P0OLzhDW+o1zISNW2C6AVfHlHHw/33319uBxJnroSjjjqq2mKLLcr9RvSsvvOd76wfwYonaDEkEZpiUovBlu9///v1s3saMs0A6zhtsD8TJ06s7y0SA9hDnE4SQapziZ+x9dZbl+fEqSmdxo8fX99bXHMKTYQ4uls0GKMxesEFF5TB1jHgP07N2m+//coXdJweNWfOnOo5z3lOv9fweSjiSzsmTOg0bty43vrdt9Ebv1dMprDmmmuWxvXSNKeDzZ07d7E62jS+DzzwwPK5Q3M6zs4771wOWPQn1oVodHdONhCn5TQNmdWB+rLq68v5559fJkKIUw8XLlxYrp/17W9/u/ydGLmagBUHRpdHMylNc6rtQOKARXjGM55Rbjv118aAFcX/ZgxJnF8dYzQGWzbbbLP62T1f2CEudNwcRe4Ur+kUFxENn//858u51/0tcXQ2zJ8/v9z2FT+vP6vD0fvVUfSU7rLLLtUxxxxTxv7FeL6YcSq2dzQwl/Xi2WGw2c+i0do0XDvFzGrhvPPOK7fh61//epkhLhrvnUda+xOzwI0ZM6YcnIgDCqHValVf+9rXyv2+vRwxXjEMdpS4OeAQR4Q7e3E7e1lWJ+pL/1ZUffnHP/5RxsbFmQjxe8QFoeP/74997GNLnOXAyNMcFG3aA8uqGZsVY/gGEgcYYqxhiH2hP3H2y+p0UIlVS9BipWqOVMbpIgPpnCY6xBHdEAOzoxdtsKU5NaYvR0hHruiFiKmpf/jDH9YlS4ov1bgkQNOY7ZzeejDNUdRosC6PqKujR4+urrnmmt5GbXM5gcMOO6zcLk009A855JByv+npiKm+o6d4u+22K+Gg02AN/ZjGO8Rps5tsskm5v7pRXxa3sutLTMCx4447lkk74vTM+Iw//vGPe3vPGPmaoBT7ShOKliZ6v2Iyi9A5DKCv2AdiCQO1M+IU1eixhpVB65OVqjmSFTNbDXTaQIzr6tQcWY3/IOP6V4MtzYxirB7imkQf//jHq1NPPbUuGVhzvZZ58+aV277i1KX+XH/99fW95RNH/JvQH70U0UtyySWXlN7VOD1tWTWng8UpbtGz0JwG1tn4bvatvtd86hR/qxBHeqPxvDpSX3qsivoSP2v//fcvvWMxbjbGyb3kJS+p17K6iN7MOJgR3+cf+tCH6tLBxTjtCE5xJswRRxxRly4peoybnqyBxldGuBto/4VsghYrVZymssEGG5T7A10sOAajd2oaPDEWq7+BsHF0KsJYnBIQ07iz+mjqRoxlGaynNMSU1GHSpEnlNjTj9PqbMjjG5gxl6v+m0Ru9C7FE70E0MAc6faw/22yzTTl4EFNsX3TRReVCsdHobXouGtFjEa6++ureHpFO0XMQBhq7sDpQX3qsivrytre9rfyNIlx98YtfLJNzsPqJ4QTNhCdnnHFGb6AfSHynx8GREJdkWNqU8M0+vjxtDFhhWl0uPsII+Bhdp5ne/eyzz27Nnz9/qUvfi0+eeOKJ5bXtBkvr+uuvr0t7xLTEzTbtO737bbfd1jvte0y93Fe7MdI65phjyroJEybUpT2a6d07X9OYPn16Wd9uANQlrEzxt49lKGL63o033ri8T7uB2brlllvqNYvEVP5R79oNzvK8r9RTXIe4eGqUxYVa46KujZi2ep999un9HY888sh6zaLpuuOCs4NZsGBBa4sttijP3XrrrcttTM3dqb/puvtqLrA5fvz4chv1uj/N7zt16tQyPXdfF154YbnMwRprrNFqh4G6dOALfj5U8V6xDNfp3dWXRVZ2fdl8883Le3ZOub2ixO8ZC8PPvHnzyuVhYvvEvnTKKaeU7/K+Yp+Keti0N2Kf+Ne//lWv7dFffbzyyitLWey/559/fl3a47rrriuXgYn1sdxrevdhq9lG3a7rP8FI2RDdpvmPb1mXuGZWI77Q45owUR7/0c6YMaM1a9as1kEHHVS+1ONLP9b1DVrhM5/5TO/7HXDAAa2PfOQj5fov0ViKsnXWWWeJa2wJWsNbsz2H6hvf+EapO/Fe66+/fmvPPfdsve51ryvbddq0aa2xY8f2/qw3v/nN9at6RKN6zJgxZd1GG21U6uHBBx9cGoWjRo3qrUMPpeEcZs6c2fuzt99++7p0cUtrOEfjIhojzfvEdeP6E42I5lpKO+ywQ+v4449vnXzyya1DDz20td5665Xyzs+/ugWtoL70WJn1pfkbxBJ/p6Ut8XcequbnMTzdeOONrUmTJvVup9g/Jk6c2DrkkENaz3rWs0r9btZFfftPP9e2G6g+HnbYYaU8wlZc8+6kk05qHX300WWfjZ/RXENT0Bq+mm3f7br+E4yUDdFthhK0QvyH2QSqvks0dm666aZ+XxPmzp3b+x9k3yUugBiNhk6C1vDWbL8M0dMwZcqU3vfsXHbaaafW7Nmz62cvLi6IHb2hfZ8fRz3nzJlTXhOPH2rDOXo9mvcc6EKsS2s4hwgA8Zzojbnvvvvq0iVFL3F81uZnNktc8DsaJZ1Wx6AV1JceK6u+nHnmmUv8jMGW+zsuZv9QNO/F8BXbOQ4uNIG/c9lyyy3LAYDO3q7GQPUxnh+vi9De9/0mT55cetPGjRtXHg+2b7BqNdus242Kf9ofpGu1d6Jy2+UfY7XVboCU87NjwHdM8TvQ9Vz6inEV7cZIde2115ZZuuJ6LjvssEO9lm6yIvbfqFPNEu8bA6Nj/F5z3v5gbr311lKvoh7G8+O6bd0oBnrHpAwx/ib2l9g/YkzO8oz1GY7UlxVDfWFVi20U073H/hSTWEyYMKHMRLkslzUYTEwqE2MNYxz37rvvXo0dO7Zew3A3UvZfQQtYZey/LA/1heWhvkD3Gin7r1kHAQAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBvVaqvvd6VRo0bV9wAAgJGiy2OKHi0AAIBsXd+jBQAAMNzo0QIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBkghYAAEAyQQsAACCZoAUAAJBM0AIAAEgmaAEAACQTtAAAAJIJWgAAAMkELQAAgGSCFgAAQDJBCwAAIJmgBQAAkEzQAgAASCZoAQAAJBO0AAAAkglaAAAAyQQtAACAZIIWAABAMkELAAAgmaAFAACQTNACAABIJmgBAAAkE7QAAACSCVoAAADJBC0AAIBUVfV/SZ423fB1QNQAAAAASUVORK5CYII=" class="kg-image" data-action="zoom"></figure><p>Initially, all objects stay in the Eden space and 1 <strong>Survivor </strong>space is free at any moment. &nbsp;</p><p>After a garbage collection is triggered, all live objects in <strong>Eden </strong>space can be allocated to the free <strong>Survivor </strong>space. Any live object in the other <strong>Survivor </strong>space will be reallocated to this <strong>Survivor </strong>space also. After a certain number of reallocations between the survivor spaces, objects that still live will be moved to the <strong>Old</strong> space. </p><p>When a garbage collection is triggered, all other threads in our java application will be suspended. The event is called "<strong><em>Stop the World</em></strong>" event. </p><p>To measure performance of these garbage collections we should be concerned with: </p><p><strong>Throughput</strong>: the percentage of total time spent <strong>not </strong>in GCs. </p><p><strong>Latency</strong>: the responsiveness of the program. </p><p>Choosing the right size for each generation space is important. &nbsp;</p><p>For example, maximizing the Eden space will increase throughput. But each pause would take more time and contribute greatly to the overall latency of the application. &nbsp;</p><p>Doing the opposite by rising the Old space will lower latency of each collection with a decrease in throughput as well. </p><p>There is no right way to choose the right size of a generation. This would depend on your application's characteristics and needs. </p><h2 id="do-we-really-need-to-care-about-gc-in-all-our-apps">Do we really need to care about GC in all our apps?</h2><p>No, <em><strong>not really</strong></em>, not all of the time.</p><p>For some apps, GC don't matter much, as long as there's still space left for the programs to run. </p><p>In contrary however, for enterprise-class applications which involve large amount of data going in and out the system, multi-threads and high request frequency rates, if we don't optimize and tune the GC, those small pauses may collectively contribute to a noticeable loss of performance.</p><p>Take this example from oracle official guidelines</p><figure class="kg-card kg-image-card"><img src="data:image/png;base64,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" class="kg-image" data-action="zoom"></figure><p>Assuming we have a perfectly optimized application, save for only the GC, which runs in single thread. </p><p>Starting with a uniprocessor, the program spends 1% CPU time doing garbage collection. By scaling up the system vertically by increasing to 32 processors, the system's parallelism, which is supposed to increase the overall throughput, instead is hindered by the synchronous garbage collection mechanism. As a result, nearly 75% throughput is lost. </p><p>So, it's safe to say, for some cases, GC tuning is necessary to maintain consistent application's performance. </p><h2 id="what-types-of-gc-are-there">What types of GC are there?</h2><p>We already know the basic mechanism of how GCs collect unused memory space, but there are many available concrete algorithms to go about that and many implementations to choose from when you start up your application. </p><p>Below are the default Garbage Collectors for each java iteration starting from java 7. </p><table>
+<thead>
+<tr>
+<th>Java Version</th>
+<th>Default Garbage Collector</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.7</td>
+<td>Client mode: Serial Collector <br> Server mode: Parallel Collector</td>
+</tr>
+<tr>
+<td>1.8</td>
+<td>Client mode: Serial Collector <br> Server mode: Parallel Collector</td>
+</tr>
+<tr>
+<td>1.9</td>
+<td>G1 Garbage Collector</td>
+</tr>
+</tbody>
+</table>
+<h2 id="serial-collector">Serial Collector</h2><p>Does everything within 1 thread, this collector is suited for machines with single processor. </p><p>Can be enabled with the option <strong>-XX:+UseSerialGC </strong></p><p>Uses a compact collection method, old memory will be put as at the beginning of the heap so new memory allocation can be contiguous chunks at the end of the heap making the allocation faster. </p><p>Used mainly on single-threaded client style machines without strict pause time requirements </p><h2 id="parallel-collector">Parallel Collector</h2><p>Is also known as the Throughput Collector </p><p>Uses multiple threads to speed up the garbage collection. For a system with &lt;N&gt; physical hardware threads, a fixed fraction of &lt;N&gt; will be used for collector thread size. </p><p>By focusing on the throughput, maximum latency may rise to a high level occasionally during the major collection. </p><p>Suitable for applications that has to do multiple jobs at the same time, while maximum latency is not important (multi-threaded computing, report generation for big data set,...) </p><p>Can be enabled using options:</p><ul><li><strong>-XX:+UseParallelGC</strong> for multi thread young generation collectior, single thread old generation collector </li><li><strong>-XX:+UseParallelOldGC</strong> for both multithread on old and young generation collectors </li></ul><p>At the start of each collection, each thread would register a space inside the old generation. Thus, by doing so, these spaces would cause a fragmentation effect as time goes. The effect may be reduced by decreasing the number of collector threads. </p><p>How to tune: in the order below</p><p><strong>Pause time</strong>: <strong>-XX:MaxGCPauseMillis=<em>&lt;N&gt;</em></strong><em> if maximum pause time cannot be achieved, the generations are shrunken in turn</em> </p><p><strong>Throughput</strong>: <strong>-XX:GCTimeRatio=<em>&lt;N&gt;</em></strong><em>, if not achieved, the generations at faults are increased in turn as well</em> </p><p><strong>Footprint</strong>: </p><p><strong>-Xmx<em>&lt;N&gt;</em></strong><em>, depicts maximum heap size allowed</em> </p><p><strong>-Xms&lt;N&gt;</strong>, initial heap size. </p><p><em><strong>Default heap size</strong>: maximum is 1/4 of total memory, initial size is 1/64 of total memory.</em> </p><h2 id="mostly-concurrent-collectors">Mostly Concurrent Collectors</h2><p>Do parts of their work concurrently </p><p>HotSpot VM has 2: &nbsp;</p><ul><li>Concurrent Mark Sweep (CMS) collector </li><li>Garbage-First (G1) collector </li></ul><p>Run concurrently with application threads, takes processor resources to do garbage collecting thus resulting in shorter major collection pause time, though throughput is a bit lower than other collectors.</p><h3 id="concurrent-mark-sweep-collector-cms-collector-">Concurrent Mark Sweep Collector (CMS Collector)</h3><p>Preferably for applications with large datasets that live long (big old generation space) with a priority for short pauses like graphical applications, servers responding to requests,... </p><p>It uses separate GC threads to scan the old for live objects to reduce major pauses. </p><p>Does not compact live object after each sweep so when fragmentation happens, allocates a bigger heap </p><p>Is enable by: <strong>-XX:+UseConcMarkSweepGC </strong></p><p>When the collector fails to allocate a free space in the old generation, a major pause happens with all other application threads stopped. This is called <strong>concurrent mode failure.</strong> When this happens, it indicates that we need to tune the collector parameters</p><p>To debug: <strong>-Xlog:gc </strong></p><h3 id="garbage-first-collector">Garbage-First Collector</h3><p>Has been available since java 7, but not until java 9 that it becomes the default GC </p><p>Suitable for multi-processor systems with lots of physical memory. </p><p>Aims for best balance between throughput and latency </p><p>Heap size support larger than 4GBs </p><p>On the other hand, doesn't do well with small heaps. </p><p>This is created to replace the CMS Collector and become the default Garbage Collector, in contrast to CMS Collector, this is a compact Collector. </p><p>Can be enabled by: <strong>-XX:+UseG1GC</strong> </p><figure class="kg-card kg-image-card"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA8AAAALQCAIAAADQFY7jAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAEhTSURBVHhe7d1fiF3neS/+NeFcJBdFphea2BTJ4XdqcSjHVpI2sRLqKFIgHDca3zhFE1CvJEUiCRSki5Mi4RESyY1EA22QLOkmMVSiLuVYkzrHKRJyQhLh4kQKhMZqcnIkio10ETTkgHPCofN71n7fvbK198zWvDOambVnPh82289617v3Xn/G0ne9emftsdnZ2QoAAFiY9+T/AgAACyBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCAAgI0AAAUEKABAKCAAA0AAAUEaAAAKCBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCAAgI0AAAUEKABAKCAAA0AAAUEaAAAKCBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGhY42ZmZq5du3bu3LmjR4+O9YjFaIxV0SF3XZjon9+iI7cWyi/uyq1zyT26cuv60HeoG3n1PHKnrtzakZu6cuuaEMfq1KlTeaFH3tWu3AqwNGOzs7O5BNaWu3fvvvTSS4cPH87L8zt58uSePXs2btyYl4eK2L1///68UFWL+zOkL8oMeZOF91x74vJm27ZteaHH9evXn3rqqbwwYMgRW6sH88qVKzt37oxicI/W888PsHyMQMPaFNlrfHx8Iek5RLe9e/feuHEjL88v3rY3PbOs/umf/ilX93vjjTdyte7dvHnz4MGDKT0DrBgj0LAGXbx4cXJyMi+UeOutt5544om8MGB6enpiYiIvdC3uzxAj0A80MzPzyCOP5IUBiztia+9gPnCP1u3PD7CsjEDDWnPlypW+9Lxr165Lly7dunUr0kNy796969evHzhwIPfomm/E+u7du0ePHh1Mzyyf//2//3euOk6e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FBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCAAgI0AAAUEKABAKCAAA0AAAUEaAAAKCBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCAAgI0AAAUEKABAKCAAA0AAAUEaAAAKCBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCAAgI0AAAUEKABAKCAAA0AAAUEaAAAKCBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCAAgI0AAAUEKABAKCAAA0AAAUEaAAAKCBAAwBAAQEaAAAKCNAAAFBAgAYAgAICNAAAFBCgAQCggAANAAAFBGgAACggQAMAQAEBGgAACgjQAABQQIAGAIACAjQAABQQoAEAoIAADQAABQRoAAAoIEADAEABARoAAAoI0AAAUECABgCABauq/x+VNpuUbIqBxQAAAABJRU5ErkJggg==" class="kg-image" data-action="zoom"></figure><p>Heap is a contiguous space divided into large fixed size regions, about 2MB each by default. </p><p>Each region can be Eden space, Survivor space, Old generation or unassigned. </p><p>By using these non-contiguous regions, the G1 may pick a small group of region to collect and finish quickly instead of doing the whole space like the other collectors thus having the ability to support large heaps </p><p>The amount of live data in each region is tracked, and when a collection is triggered the G1GC will clear the ones with the most ‘garbage’ first hence the name. </p><h2 id="epsilon-collector">Epsilon Collector</h2><p>Epsilon is a "no-op" GC. </p><p>It does handle memory allocation but doesn't reclaim them back when objects are not live. </p><p>When your application uses up all the heap, the JVM would shut down. </p><p>Epsilon is for when you know exactly what your application does and want to squeeze every last bit of performance out of it. </p><p>Activate with: <strong>-XX:+UnlockExperimentalVMOptions &nbsp;-XX:+UseEpsilonGC &nbsp;-XmxXg </strong> </p><p><strong>XmxXg</strong> is to set the heap size for your application, example: <strong>-Xmx4G</strong> for a heap of 4GB </p><h2 id="z-garbage-collector">Z Garbage Collector </h2><p>This garbage collector is design for <strong>low latency</strong> with support to multi-terabytes heaps, even lower than G1 Collector default 200ms max pause time. Throughput is also guaranteed. </p><p>It was first introduced in java 11, until java 12 the garbage collector is still in experimental mode. </p><p>Does all expensive work concurrently which doesn't stop application thread for more than <strong>10ms</strong>. </p><p>Only available on 64 bit linux, it uses the 64 bit pointers to encode additional information in each pointer. </p><p>Can be unlocked with: <strong>-XX:+UnlockExperimentalVMOptions -XX:+UseZGC </strong></p><h2 id="shenandoah-garbage-collector">Shenandoah Garbage Collector</h2><p>Developed at red hat and has been around for years. The garbage collector is now a part of java 12. </p><p>Trades CPU resources and memory space to achieve low pause time with its concurrent operations. </p><p>Also promises maximum pause time no longer than <strong>10ms</strong> like the Z Garbage Collector </p><p>Can be unlocked with: <strong>-XX:+UnlockExperimentalVMOptions -XX:+UseShenanodoahC &nbsp;</strong></p><p>Shenandoah needs to collect heap faster than the application eats up, if it can't, a failure would occur and trigger 1 of the 3 configurable mechanism: </p><p>Pacing: if the garbage collector doesn't allocate fast enough, it starts up more threads to do the allocating, it it fails, comes the next mechanism. </p><p>Degenerated GC: when allocation failure occurs, it trigger a stop-the-world event. Usually this is when most of the collection cycle are nearly completed so this event should be brief. If this one fails, escalate to the next mechanism. </p><p>Full GC: This would almost guarantee 100% success rate for memory allocation unless there's no space left in the heap. </p><p>Shenandoah offers the same advantages like the ZGC with larger heaps. But it has been around for longer than ZGC so it has seen more testing and tuning. </p><p></p><p>There goes the introduction to all currently available Garbage Collectors from java 7 to java 12.</p><p><strong>In this next section, we discuss in more details when to use what Garbage Collector.</strong></p><p><strong>Serial Garbage Collectors</strong>: you should use this collector if your application is a client type app that doesn't need multi-threading computing. </p><p><strong>Parallel Garbage Collectors</strong>: this collector is also called the throughput collector for its use of multiple threads to do young generation collection. On the other hand, it may cause fragmentation in the old generation that would lead to long major collection. So use it if your application can take these occasional long pauses that can last up to 1 second. Suitable for utility applications that require maximum throughput to process data and do computation. </p><p><strong>CMS Garbage Collector</strong>: this is a concurrent collector which focuses on reducing major pauses. It is most suitable for applications that doesn't tolerate long pauses like apps that require smooth graphical interfaces, servers serving requests that need to qualify a maximum latency constraint,... Though it would require more CPU resources to do its job and shouldn't be used for heaps bigger than 4GBs. </p><p><strong>G1 Garbage Collector</strong>: this is made to replace the CMS Garbage Collector with enhancements to support larger heaps (up to 10 GBs or larger), balancing between throughput and latency. By using this, just like the CMS, be prepared to trade CPU time for better latency. Although the throughput for this collector may be slightly worse than other collectors. Suitable for server type applications that require large heaps, deployed on system with enough CPU to spare. </p><p><strong>Epsilon Garbage Collector</strong>: This is a no-op garbage collector, which means it doesn't collect garbage at all. It just helps allocate memory for your application. Use this if and only if you know exactly what you are doing with your available memory and your application doesn't create garbage. On the other hand, by cutting out the garbage collecting mechanisms, your application achieves maximum performance possible. </p><p><strong>Z Garbage Collector</strong>: support big heaps, multi-terabytes at that and in the same time, offer no more than 10ms maximum latency (works are being done to keep this to 1ms). The collector is NUMA-aware (which needs another article to dive into). So by enabling the NUMA-aware option on NUMA machines, the different in performance can be noticeable. This collector can be enabled on 64 bit linux machines only. Use it if your server application qualify for all the needs and requirements above. </p><p><strong>Shenandoah Garbage Collector</strong>: this garbage collector is similar to the Z Garbage Collector. It is only available to java 12, OpenJDK. Oracle JDK doesn't support this GC. Suitable for large heap size only and if you don't have a pause time constraint, consider using G1 Garbage Collector instead. </p><p><strong>In this last section, we will find out how to tune each Garbage Collector</strong></p><p><strong>Serial Garbage Collector: </strong>There's no tip but to keep your dataset approximately 100MB </p><p><strong>Parallel Garbage Collector:</strong></p><p>On a machine with &lt;N&gt; hardware threads, the default total GC thread is a fixed fraction of &lt;N&gt;</p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XX:ParallelGCThreads</td>
+<td>Total number of GC threads</td>
+<td>more threads means more throughput. Too many would lead to defragmentation with longer major pauses</td>
+</tr>
+<tr>
+<td>XX:MaxGCPauseMillis</td>
+<td>The maximum pause time desired</td>
+<td>decreasing this value may lead to lower throughput</td>
+</tr>
+<tr>
+<td>XX:GCTimeRatio</td>
+<td>The desired throughput</td>
+<td>value indicate 1/(1+<value>) time in GC.  Example: -XX:GCTimeRatio=19 means the goal is 1(1+19) = 1/20 time in GC</value></td>
+</tr>
+<tr>
+<td>Xms</td>
+<td>initial heap size</td>
+<td>The GC will start at the initial heap size and increase to the maximum heap size until the goals are met</td>
+</tr>
+<tr>
+<td>Xmx</td>
+<td>max heap size</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>CMS Collector:</strong></p><p>Unlike the serial or parallel collector that starts collecting from the old generation when it becomes full, the CMS Collector schedule to collect from the old generation before it is full with dynamic estimates.</p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xlog:gc*=debug</td>
+<td>print debug info</td>
+<td></td>
+</tr>
+<tr>
+<td>XX:CMSInitiatingOccupancyFraction</td>
+<td>the percentage of occupancy in the old generation to start a collection</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>G1 Collector:</strong></p><p>the G1 collector is good enough on its own with the default configuration. But in certain cases, we can tune it to our need.When moving from other Garbage Collector to G1, remove all options concerning garbage collection, keeping only the maximum heap size.</p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XX:MaxGCPauseMillis</td>
+<td>the desired pause time in milies</td>
+<td>increase this value if you need throughput, decrease it for lower latency</td>
+</tr>
+<tr>
+<td>Xmx</td>
+<td>max heap size</td>
+<td></td>
+</tr>
+<tr>
+<td>Xlog:gc*=debug</td>
+<td>print debug info</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Major collection would lead to long pauses when the GC allocate too many objects without reclaiming them in time. One of the reasons could be because of too many objects allocated before they can be reclaimed. Or the humongous objects are too many leading up to the need for collection. </p><p>The below options may help with this case:</p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XX:G1HeapRegionSize</td>
+<td>the size of the heap region</td>
+<td>Increase this to make space for humongous objects. If there's no space available for the humongous object, a collection would be called</td>
+</tr>
+<tr>
+<td>XX:ConcGCThreads</td>
+<td>number of concurrent GC threads</td>
+<td>increasing this speeds up the collecting process but eats up more CPU resources</td>
+</tr>
+<tr>
+<td>XX:+DisableExplicitGC</td>
+<td>disable the explicit GC calls by the app</td>
+<td>unnecessary explicit GC calls by devs like <strong>System.gc()</strong> may lead to unwanted performance issues, this options disable that function call</td>
+</tr>
+</tbody>
+</table>
+<p>To tune for latency, use the below options </p><p>Also, one should always check for logs to determine if the GC is getting enough CPU resources. If it lacks CPU time, latency would rise. </p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XX:+AlwaysPreTouch</td>
+<td>allocate the heap regions on JVM startup</td>
+<td>allocating heap regions may take time with big heaps, pre-touch them on startup to potentially lower the response time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Epsilon Garbage Collector</strong></p><p>The most important option for this collector would be the maximum heap size</p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xmx</td>
+<td>Maximum heap size</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Z Garbage Collector</strong></p><p>This is a concurrent garbage collector, so we need to leave sufficient heap space for the live objects and spare space to do heap allocation when the application threads are running. &nbsp;</p><p>Also, we can define the total threads used for the GC, too many would eat up our application CPU time, too few would lead to the application allocating memory for objects faster than the GC can reclaim. </p><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Desc</th>
+<th>Tips</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xmx</td>
+<td>Maximum heap size</td>
+<td>remember to leave enough to save room for object reallocationing</td>
+</tr>
+<tr>
+<td>XX:ConcGCThreads</td>
+<td>total number of GC threads</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p></p><p>In conclusion of this post, GC tuning is sometimes necessary and sometimes isn't. </p><p>It is our job to know and understand the nature of JVM's GC mechanism to ensure maximum performance for our java applications.</p><p>And hopefully with this post, may you find the most suitable GC for your need .!</p>
+
+        
+        <div class="row u-marginTop30 prev-next">
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/java-features-by-the-releases-and-migration-guide-for-them/" class="prev-next-link u-block u-marginBottom10">
+            <span class="prev-next-span u-block"><i class="i-arrow-round-prev u-fontSizeLarge arrow-left"></i> Prev article</span>
+            <h5 class="prev-next-title">Java features by the releases and migration guide for them</h5>
+        </a>
+    </div>
+
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/kien-truc-luc-giac-hexagonal-architecture/" class="prev-next-link u-block u-marginBottom10" style="text-align:right">
+            <span class="prev-next-span u-block">Next article <i class="i-arrow-round-next u-fontSizeLarge arrow-right"></i></span>
+            <h5 class="prev-next-title">Kiến trúc lục giác (Hexagonal Architecture)</h5>
+        </a>
+    </div>
+</div>
+
+        <div class="row mob-share u-marginTop30 u-hide-after-lg">
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/"> <span class="share-title">SHARE</span></a>
+    </div>
+
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/java-garbage-collector-examination/#" class="mapache-share i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/java-garbage-collector-examination/" data-title="A Java Garbage Collector examination "> <span class="share-title">TWEET</span></a>
+    </div>
+</div>
+
+        <hr class="post-footer-hr">
+
+        
+
+    </div>
+</article>
+
+
+
+<div class="post-comments-overlay u-absolute0 toggle-comments"></div>
+
+
+
+        </div>
+
+        <aside class="sidebar col-right sidebar-sticky u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+                
+
+    
+    
+
+
+
+    
+<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none; top: 0px; left: 1183px;"><div class="sidebar-items u-marginBottom30 u-flexColumn">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Latest Articles</span></h3>
+
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">1</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Tìm hiểu API Gateway (Spring Cloud Gateway &amp; Zuul 2)</h3>
+        <a href="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">2</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Sử dụng RegEx để trích xuất OTP ngân hàng</h3>
+        <a href="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">3</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h3>
+        <a href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">4</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Hướng dẫn tích hợp gRPC-Web vào React JS app</h3>
+        <a href="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">5</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">OTP của VNG được sinh ra như thế nào?</h3>
+        <a href="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</div><div class="sidebar-items u-marginBottom30">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Tag Cloud</span></h3>
+
+        <a href="http://engineering.zalopay.vn/tag/distributed/" title="distributed" class="button tag-button">distributed</a>
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-system/" title="distributed system" class="button tag-button">distributed system</a>
+        <a href="http://engineering.zalopay.vn/tag/backend/" title="backend" class="button tag-button">backend</a>
+        <a href="http://engineering.zalopay.vn/tag/tidb/" title="TiDB" class="button tag-button">TiDB</a>
+        <a href="http://engineering.zalopay.vn/tag/raft/" title="raft" class="button tag-button">raft</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-database/" title="distributed database" class="button tag-button">distributed database</a>
+        <a href="http://engineering.zalopay.vn/tag/golang/" title="golang" class="button tag-button">golang</a>
+        <a href="http://engineering.zalopay.vn/tag/2pc/" title="2PC" class="button tag-button">2PC</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-transaction/" title="distributed transaction" class="button tag-button">distributed transaction</a>
+</div><div class="widget-twitter sidebar-items u-hide">
+        <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder">
+            <span class="u-paddingBottom10 u-inlineBlock">Recents Tweets</span>
+        </h3>
+    </div></div></aside>
+    </div>
+    
+<div id="disqus_thread"><iframe id="dsq-app3916" name="dsq-app3916" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./A Java Garbage Collector examination_files/saved_resource(1).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 395px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://https-engineering-zalopay-vn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+
+</section>
+
+
+<div class="instagram u-overflowHidden u-hide u-relative u-backgroundWhite">
+    <div class="instagram-wrap row"></div>
+    <span class="instagram-name u-absolute"></span>
+</div>
+</main>
+
+    <footer class="footer u-fontSizeSmaller u-fontWeightBold">
+    <div class="footer-links">
+
+        <div class="extreme-container u-flexCenter u-flexColumn">
+            <aside class="follow followMe u-textColorWhite u-fontSize20 u-textAlignCenter">
+                
+                
+                
+            </aside>
+
+            <ul class="footer-menu u-textUppercase u-textAlignCenter u-marginTop20 u-hide"></ul>
+        </div>
+
+
+    </div>
+
+    <div class="footer-copy u-textAlignCenter">
+        © 2020 <a href="http://engineering.zalopay.vn/">ZaloPay Engineering</a>
+        Design with <i class="i-favorite animated infinite pulse" style="color:red;display:inline-block"></i> by <a href="https://goo.gl/Jf1tZe" target="_blank" title="Developer FullStack.">@GodoFredoNinja</a>
+    </div>
+</footer>
+
+    <div class="search u-fixed">
+    <form class="search-form u-relative u-sizeFullWidth u-marginAuto u-marginBottom20">
+        <input id="search-field" class="u-sizeFullWidth u-md-fontSizeBase u-fontSize40 u-fontWeightSemibold" type="text" placeholder="Search...">
+    </form>
+
+    <div id="searchResults" class="search-results u-marginAuto u-sizeFullWidth"></div>
+</div>
+
+    <div class="loadingBar"></div>
+
+    
+
+    <script src="./A Java Garbage Collector examination_files/jquery.min.js"></script>
+
+    
+
+    <script src="./A Java Garbage Collector examination_files/main.js"></script>
+
+    
+<div id="fb-root"></div>
+
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://engineering.zalopay.vn/java-garbage-collector-examination/';
+        this.page.identifier = 'ghost-5ec202dbe6b9c70001a08861';
+    };
+
+    var $showComments = $('.post-comments-show');
+
+    (function(d, s, id) {
+        if (typeof disqusShortName !== 'undefined') {
+            $('.mapache-disqus').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js = d.createElement(s);
+            js.src = 'https://'+disqusShortName+'.disqus.com/embed.js';
+            js.async = true;
+
+            js.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(js);
+        } else if (typeof facebookLocaleComments !== 'undefined') {
+            $('.mapache-facebook').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://connect.facebook.net/'+facebookLocaleComments+'/sdk.js#xfbml=1&version=v3.1';
+            js.async = true;
+            fjs.parentNode.insertBefore(js, fjs);
+        } else {
+            $showComments.remove();
+        }
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+    <script>
+        Prism.plugins.autoloader.languages_path = 'http://engineering.zalopay.vn/assets/scripts/components/';
+        $('.post-body').find('pre').addClass('line-numbers');
+    </script>
+
+    <script>WebFontConfig ={google:{families:['Ruda:400,700,900','Merriweather:300,400,700','Fira+Mono:400']}};(function(){var wf=document.createElement('script');wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';wf.type='text/javascript';wf.async='true';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(wf,s);})();</script>
+
+
+<iframe style="display: none;" src="./A Java Garbage Collector examination_files/saved_resource(2).html"></iframe><div id="Xhf7y1a-1603449089114" class="" style="display: block !important;"><iframe id="o7gfixH-1603449089115" src="./A Java Garbage Collector examination_files/saved_resource(3).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; position: static !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 350px !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; display: none !important; height: 120px !important;"></iframe><iframe id="YlUShUU-1603449089117" src="./A Java Garbage Collector examination_files/saved_resource(4).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; z-index: 1000001 !important; cursor: auto !important; float: none !important; pointer-events: auto !important; box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 10px 0px !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; width: 60px !important; min-width: 60px !important; max-width: 60px !important; border-radius: 50% !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; margin: 0px !important; top: auto !important; bottom: 20px !important; right: 20px !important; left: auto !important; display: block !important;"></iframe><iframe id="KcUxroQ-1603449089118" src="./A Java Garbage Collector examination_files/saved_resource(5).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; display: none !important; z-index: 1000003 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; top: auto !important; bottom: 60px !important; right: 15px !important; left: auto !important; width: 21px !important; max-width: 21px !important; min-width: 21px !important; height: 21px !important; max-height: 21px !important; min-height: 21px !important;"></iframe><iframe id="xPB1MNR-1603449089296" src="./A Java Garbage Collector examination_files/saved_resource(6).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; bottom: 30px !important; top: auto !important; right: 0px !important; left: auto !important; width: 124px !important; max-width: 124px !important; min-width: 124px !important; height: 95px !important; max-height: 95px !important; min-height: 95px !important; z-index: 1000002 !important; margin: 0px !important; display: none !important;"></iframe><div class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 100% !important; display: none !important; z-index: 1000001 !important; cursor: move !important; float: left !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="BIPcuEA-1603449089114" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 6px !important; height: 100% !important; display: block !important; z-index: 999998 !important; cursor: w-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="seW5eu6-1603449089115" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: 0px !important; bottom: auto !important; left: auto !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 6px !important; display: block !important; z-index: 999998 !important; cursor: n-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="nIpyN8Y-1603449089115" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 12px !important; height: 12px !important; display: block !important; z-index: 999998 !important; cursor: nw-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><iframe id="F7iGZmy-1603449089594" src="./A Java Garbage Collector examination_files/saved_resource(7).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 378px !important; height: 876px !important; display: none !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; bottom: 100px !important; top: auto !important; right: 20px !important; left: auto !important;"></iframe></div><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./A Java Garbage Collector examination_files/saved_resource(8).html"></iframe><div id="eJOY__extension_root" class="eJOY__extension_root_class" style="all: unset;"></div></body></html>

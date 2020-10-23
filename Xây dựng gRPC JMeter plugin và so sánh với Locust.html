@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/ -->
+<html lang="en" class="wf-ruda-n4-active wf-ruda-n7-active wf-ruda-n9-active wf-merriweather-n4-active wf-merriweather-n7-active wf-firamono-n4-active wf-merriweather-n3-active wf-active" style="transform: none;"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><style type="text/css" id="dark-mode-custom-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Xây dựng gRPC JMeter plugin và so sánh với Locust</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" type="text/css" href="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/main.css">
+
+    <link rel="shortcut icon" href="https://engineering.zalopay.vn/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/amp/">
+    
+    <meta property="og:site_name" content="ZaloPay Engineering">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Xây dựng gRPC JMeter plugin và so sánh với Locust">
+    <meta property="og:description" content="1. Giới thiệu Sau khi xây dựng xong một service, điều đầu tiên chúng ta quan tâm là kiểm tra xem service đó có chạy đúng yêu cầu hay không bằng cách xây dựng một bộ test-case để đưa input vào service và kiểm tra xem output có đúng như">
+    <meta property="og:url" content="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/">
+    <meta property="og:image" content="http://engineering.zalopay.vn/content/images/2020/04/grpc-jmeter-plugin-1.png">
+    <meta property="article:published_time" content="2020-04-27T05:17:44.000Z">
+    <meta property="article:modified_time" content="2020-04-28T13:07:44.000Z">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Xây dựng gRPC JMeter plugin và so sánh với Locust">
+    <meta name="twitter:description" content="1. Giới thiệu Sau khi xây dựng xong một service, điều đầu tiên chúng ta quan tâm là kiểm tra xem service đó có chạy đúng yêu cầu hay không bằng cách xây dựng một bộ test-case để đưa input vào service và kiểm tra xem output có đúng như">
+    <meta name="twitter:url" content="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/">
+    <meta name="twitter:image" content="http://engineering.zalopay.vn/content/images/2020/04/grpc-jmeter-plugin-1.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Nguyễn Huỳnh Thoại">
+    <meta property="og:image:width" content="1837">
+    <meta property="og:image:height" content="834">
+    
+    <script type="text/javascript" async="" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/analytics.js"></script><script src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/webfont.js" type="text/javascript" async=""></script><script async="" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/default" charset="UTF-8" crossorigin="*"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ZaloPay Engineering",
+        "logo": "http://engineering.zalopay.vn/favicon.ico"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Nguyễn Huỳnh Thoại",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://engineering.zalopay.vn/content/images/2019/04/53160432_554374244971763_3315427384840159232_o.jpg",
+            "width": 1440,
+            "height": 1440
+        },
+        "url": "http://engineering.zalopay.vn/author/nguyen-huynh-thoai/",
+        "sameAs": []
+    },
+    "headline": "Xây dựng gRPC JMeter plugin và so sánh với Locust",
+    "url": "http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/",
+    "datePublished": "2020-04-27T05:17:44.000Z",
+    "dateModified": "2020-04-28T13:07:44.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://engineering.zalopay.vn/content/images/2020/04/grpc-jmeter-plugin-1.png",
+        "width": 1837,
+        "height": 834
+    },
+    "description": "1. Giới thiệu Sau khi xây dựng xong một service, điều đầu tiên chúng ta quan tâm là kiểm tra xem service đó có chạy đúng yêu cầu hay không bằng cách xây dựng một bộ test-case để đưa input vào service và kiểm tra xem output có đúng như",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://engineering.zalopay.vn/"
+    }
+}
+    </script>
+
+    <script src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/ghost-sdk.min.js"></script>
+<script>
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "404c2ad841f6"
+});
+</script>
+    <meta name="generator" content="Ghost 2.9">
+    <link rel="alternate" type="application/rss+xml" title="ZaloPay Engineering" href="http://engineering.zalopay.vn/rss/">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141214835-1');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e1d2d447e39ea1242a474e4/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<link rel="stylesheet" href="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/css" media="all"><script src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/embed.js" data-timestamp="1603449104500"></script><style type="text/css">@keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-moz-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-webkit-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}#xzAPzLr-1603449104567{outline:none!important;visibility:visible!important;resize:none!important;box-shadow:none!important;overflow:visible!important;background:none!important;opacity:1!important;filter:alpha(opacity=100)!important;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity1)!important;-moz-opacity:1!important;-khtml-opacity:1!important;top:auto!important;right:10px!important;bottom:90px!important;left:auto!important;position:fixed!important;border:0!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;padding:0!important;margin:0!important;-moz-transition-property:none!important;-webkit-transition-property:none!important;-o-transition-property:none!important;transition-property:none!important;transform:none!important;-webkit-transform:none!important;-ms-transform:none!important;width:auto!important;height:auto!important;display:none!important;z-index:2000000000!important;background-color:transparent!important;cursor:auto!important;float:none!important;border-radius:unset!important;pointer-events:auto!important}#HPQIcLp-1603449104568.open{animation : tawkMaxOpen .25s ease!important;}</style><link rel="prefetch" as="style" href="https://c.disquscdn.com/next/embed/styles/lounge.a8dc02def3107413d47189b1bce61bd9.css"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/common.bundle.847783fd9a0d1b9b80a706571a35d786.js"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/lounge.bundle.f86a840f3451e5487a277f1443585291.js"><link rel="prefetch" as="script" href="https://disqus.com/next/config.js"><style id="theia-sticky-sidebar-stylesheet-TSS">.theiaStickySidebar:after {content: ""; display: table; clear: both;}</style><script src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/alfalfalfa.0823c767a3bc925f628afd9bed26c958.js" async="" charset="UTF-8"></script></head>
+<body class="is-article clickup-chrome-ext_installed" data-page="http://engineering.zalopay.vn" style="transform: none;" cz-shortcut-listen="true">
+
+    <header class="header u-sizeFullWidth u-bgColor">
+    <div class="header-wrap u-flexCenter u-relative">
+
+        <a class="header-logo u-inlineBlock u-flex0" href="http://engineering.zalopay.vn/">
+            <span class="u-fontSizeLarge u-fontWeightBolder">ZaloPay Engineering</span>
+        </a>
+
+        <nav class="nav u-flex u-flex1 u-paddingLeft20 u-flexCenter u-hide-before-md"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="header-left u-flex0 u-flex u-flexEnd u-fontSize21">
+
+            
+            
+
+            <div class="followMe follow-more u-hide-before-md"></div>
+
+
+            <a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="follow-toggle u-relative u-fontSizeLarge u-hide u-hide-before-md i-more"></a>
+            <span class="header-line u-hide-before-md"></span>
+            <a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="search-toggle u-relative i-search"></a>
+            <a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="menu--toggle u-relative u-hide-after-md"><span></span><span></span><span></span></a>
+
+        </div>
+    </div>
+
+    <aside class="sideNav u-absolute0 u-hide-after-md u-bgColor">
+    <div class="sideNav-wrap u-absolute0">
+        <nav class="sideNav-menu"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="sideNav-follow followMe u-fontSize20 u-paddingTop20 u-paddingLeft20 u-paddingRight20">
+            
+            
+        </div>
+    </div>
+</aside>
+
+</header>
+
+    <main class="main u-relative" style="transform: none;">
+<section class="post extreme-container u-marginTop30 u-marginBottom40" style="transform: none;">
+    <div class="row" style="transform: none;">
+        
+        <div class="col-left" style="transform: none;">
+            
+<div class="post-header">
+    
+
+    <h1 class="post-title u-fontSize40 u-contentTitle u-md-fontSizeLarger">Xây dựng gRPC JMeter plugin và so sánh với Locust</h1>
+
+</div>
+
+
+            
+<div class="post-author u-flex u-flexCenter u-marginTop20">
+    <div class="u-flex0">
+        <a href="https://engineering.zalopay.vn/author/nguyen-huynh-thoai/" style="background-image:url(/content/images/2019/04/53160432_554374244971763_3315427384840159232_o.jpg)" class="avatar-image avatar-image--smaller u-backgroundSizeCover u-relative "></a>
+    </div>
+
+    <div class="u-paddingLeft15 u-textColorNormal u-flex1 u-fontSizeSmaller u-lineHeight1">
+
+        <div class="u-block">
+            <time class="datetime" datetime=" 2020-04-27 ">Published 6 months ago</time>
+            <span class="point">—</span>
+            <span class="readingTime">14 min read</span>
+        </div>
+
+
+        <div class="u-block u-paddingTop5">
+            By <a href="https://engineering.zalopay.vn/author/nguyen-huynh-thoai/" class="mapache-tracking link link--underline u-fontWeightBold u-textColorDarker" title="Posts by Nguyễn Huỳnh Thoại" data-event-category="Article" data-event-action="Author - Nguyễn Huỳnh Thoại" data-event-label="Profile" data-event-non-interaction="1">Nguyễn Huỳnh Thoại</a>
+
+            
+            
+        </div>
+
+    </div>
+</div>
+
+
+
+                <figure class="post-image u-block u-marginAuto u-maxWidth1000">
+                    <img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/grpc-jmeter-plugin-1.png" class="u-block u-marginAuto" alt="Xây dựng gRPC JMeter plugin và so sánh với Locust" data-action="zoom">
+                </figure>
+
+
+            
+<article class="post-body u-relative" style="transform: none;">
+    <div class="sharePost u-textAlignCenter u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+    
+    
+    
+    
+    
+    
+<div class="theiaStickySidebar" style="padding-top: 1px; padding-bottom: 1px; position: static; transform: none;"><a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share button--circle i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/"></a><a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share button--circle i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/" data-title="Xây dựng gRPC JMeter plugin và so sánh với Locust "></a><a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share button--circle i-reddit bg-reddit u-fontSize20" data-share="reddit" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/"></a><a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share button--circle i-linkedin bg-linkedin u-fontSize20" data-share="linkedin" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/"></a><a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share button--circle i-pinterest bg-pinterest u-fontSize20" data-share="pinterest" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/" data-title="Xây dựng gRPC JMeter plugin và so sánh với Locust"></a></div></div>
+
+    <div class="post-body-wrap">
+        <h2 id="1giithiu">1. Giới thiệu</h2>
+<p>Sau khi xây dựng xong một service, điều đầu tiên chúng ta quan tâm là kiểm tra xem service đó có chạy đúng yêu cầu hay không bằng cách xây dựng một bộ test-case để đưa input vào service và kiểm tra xem output có đúng như mong đợi. Đây là công việc của bản thân những người phát triển tính năng của service đó và là công việc quen thuộc của team QC (những người hùng thầm lặng).</p>
+<p>Tuy nhiên, sau khi kiểm tra tính đúng đắn thì chúng ta thường bỏ qua việc load-test để đánh giá khả năng phản hồi nhanh chậm của service, hoặc là kiểm tra service có thể đáp ứng bao nhiêu yêu cầu cùng một lúc, mặc dù đây cũng là một tiêu chí rất quan trọng để đánh giá chất lượng của service đó.</p>
+<p>Load test là một dạng của Performance Testing, khi đó chúng ta sẽ dùng công cụ để bắn nhiều request tới service mà ta muốn load test và sau đó ghi nhận lại thời gian phản hồi.</p>
+<p>Có hai thông số chính của kết quả load test đó là :</p>
+<ul>
+<li><strong>Response Time</strong>:  Đơn vị là milisecond, dùng để đo thời gian phản hồi từ khi gửi request đến service đến khi nhận lại response.</li>
+<li><strong>Throughput</strong>: Đơn vị là transaction/s, dùng để đo số lượng request gửi đến hệ thống trên một giây.</li>
+</ul>
+<p>Tưởng tượng rằng nếu không có load test, và service của chúng ta được deploy lên môi trường production, một dịp nào đó lượng user truy cập tăng chóng mặt và service chúng ta đáp ứng không nổi, dẫn đến treo service, hoặc phát sinh ra lỗi mà chỉ lượng tải đủ lớn mới phát hiện được (ví dụ ngẽn service, ngẽn database, ngẽn kafka, transaction failed,...). Nếu như có load test trước thì chúng ta đã hoàn toàn mô phỏng được tình huống này và thông qua kết quả để xác định điểm thắt cổ chai, cải thiện service, hệ thống trước khi điều đáng tiếc xảy ra.</p>
+<p>Và có nhiều công cụ để thực hiện load test để chúng ta lựa chọn như Gratling, Locust, hay JMeter. Nhưng trong bài này mình sẽ đề cập đến hai công cụ chính đó là Locust và JMeter, đồng thời so sánh chúng thông qua việc load test một gRPC service ping pong đơn giản.</p>
+<p><img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/best-open-source-load-testing-tools.png" alt="best-open-source-load-testing-tools" data-action="zoom"></p>
+<h3 id="11giithiulocust">1.1 Giới thiệu Locust</h3>
+<p>Đầu tiên mình xin đề cập đến <a href="https://locust.io/">Locust</a>, đây là một công cụ load test khá phổ biến, công cụ này có giao diện web khá đẹp mắt, nó cho phép chúng ta nhập vào số lượng user đồng thời và số request mà mỗi user gởi trong một giây trong quá trình load test, metrics sẽ được hiển thị dưới dạng đồ thị liên tục bao gồm các thông số như <strong>p95</strong>, <strong>p99</strong>, và số lượng request/s mà service đáp ứng được hiện tại.</p>
+<p>Giải thích thêm về các con số p95 và p99 :</p>
+<ul>
+<li><strong>P95</strong> : đơn vị thời gian là milisecond, tạm hiểu là trung bình cứ 100 request gởi đi thì có ít nhất 95 request có response time dưới ngưỡng thời gian đó.</li>
+<li><strong>P99</strong> : tương tự với P95 nhưng cứ 100 request gởi đi thì có ít nhất 99 request có response time dưới ngưỡng thời gian đó.</li>
+</ul>
+<h3 id="12giithiujmeter">1.2  Giới thiệu JMeter</h3>
+<p>Tiếp theo mình sẽ giới thiệu <strong>JMeter</strong>, đây cũng là một công cụ load test rất phổ biến và rất mạnh mẽ, nó hỗ trợ nhiều loại protocol khác nhau như HTTP, FTP, JDBC, WebSocket, v, v.., công cụ này đầy đủ các tính năng bao gồm cả load test, stress test, hỗ trợ distributed testing, giúp người dùng dễ dàng tạo kịch bản và lưu trữ dưới dạng file xml, sau đó chạy kịch bản đó, bạn đọc có thể đọc thêm chi tiết trong bài <a href="https://confluence.zalopay.vn/pages/viewpage.action?pageId=5992195">hướng dẫn</a> sau của team Performance. Vì những tính năng nổi bật đó, JMeter được sử dụng trong team Performance để load test các service của ZaloPay của các team UM, TPE, Accounting, ZPI, Promotion, v,v...</p>
+<p>Ở thời điểm hiện tại, JMeter vẫn chưa hỗ trợ protocol gRPC để đưa vào công cụ khi chúng ta tải về và dùng trực tiếp. Vì nhu cầu load test gRPC, team Performance cũng đã xây dựng một plugin hỗ trợ JMeter load test gRPC service một cách generic, bạn có thể tìm thấy plugin này trong github Open source của ZaloPay <a href="https://github.com/zalopay-oss/jmeter-grpc-plugin">tại đây</a>.</p>
+<h2 id="2xydng">2. Xây dựng</h2>
+<p>Sau đây mình sẽ bắt tay vào việc xây dựng các phần cần thiết để load test gRPC với Locust và JMeter</p>
+<h3 id="21xydnggrpcserver">2.1 Xây dựng gRPC server</h3>
+<p>Trước tiên, mình sẽ định nghĩa một file .proto cho service  PingPong cần load test như sau:</p>
+<pre class="line-numbers  language-sh"><code class="  language-sh">syntax = "proto3";
+ 
+option java_multiple_files = true;
+option java_package = "vn.zalopay.ping";
+option java_outer_classname = "PingProto";
+ 
+package ping;
+ 
+// The Ping service definition.
+service Ping {
+    // Sends a ping
+    rpc ping (PingRequest) returns (PingResponse) {}
+}
+ 
+// The request message containing the name.
+message PingRequest {
+    string name = 1;
+    int64 timestamp = 2;
+}
+ 
+// The response message containing the message
+message PingResponse {
+    int64 timestamp = 2;
+}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>Mình cũng xây dựng một gRPC server bằng ngôn ngữ Java, do khá đơn giản nên không có gì để nói ở bước này, các bạn có thể xem code <a href="https://gitlab.zalopay.vn/thoainh-group/jmeter-vs-locust/tree/master/ping-grpc-server">tại đây</a>.</p>
+<h3 id="22xydngclientbnglocust">2.2 Xây dựng client bằng Locust</h3>
+<p>Tiếp theo mình sẽ xây dựng client để bắn phá server bằng Locust , do ban đầu Locust cũng chỉ dùng cho mục đích load test HTTP nên ta chỉ cần tải Locust về và sau đó định nghĩa file locust.py (trong đó miêu tả kịch bản gọi HTTP POST, GET, PUT,...) là có thể chạy load test được ngay, nhưng để chạy benchmark những thứ khác không phải HTTP request, chúng ta cần một service khác giống như slave của Locust, service này sẽ trực tiếp record thời gian xử lý một giao dịch, một giao dịch có thể đơn giản là sleep bao nhiêu giây, hoặc là gọi gRPC từ target server và nhận response về và ghi nhận lại thời gian, sau đó gửi metrics về cho Locust server để hiển thị chúng trên nền web.</p>
+<p>Ở trong bài viết này mình sẽ sử dụng <a href="https://github.com/anhldbk/swarm">Swarm</a>, đây là một "elegant Java client for Locust" được viết bằng ngôn ngữ Java, phần lõi của Swarm sử dụng <a href="https://github.com/LMAX-Exchange/disruptor">Disruptor</a> đây được xem như một in-memory queue, một thư viện "High Performance Inter-Thread Messaging", dùng nó để xây dựng một service để bắn phá gRPC server đồng thời ghi nhận lại duration time (giống với response time) của mỗi giao dịch để hiển thị trên giao diện web của Locust, qua đó load-test được gRPC service trên.</p>
+<p>Dựa trên <a href="https://github.com/anhldbk/swarm/tree/master/src/main/java/com/bigsonata/example">example</a> của Swarm mình cũng đã xây dựng được một service để bắn phá gRPC Ping Pong server.</p>
+<p>Dưới đây là phần code dùng để tạo request và gửi đến gRPC server, nếu muốn xem toàn bộ code các bạn có thể xem <a href="https://gitlab.zalopay.vn/thoainh-group/jmeter-vs-locust/tree/master/locust-swarm-client">tại đây</a> :</p>
+<pre class="line-numbers  language-java"><code class="  language-java">@Override
+public void process() {
+  PingRequest request =
+      PingRequest.newBuilder()
+              .setTimestamp(System.currentTimeMillis())
+              .setName(String.valueOf(new Random().nextInt(10000))).build();
+  long start = System.currentTimeMillis();
+  try {
+    PingResponse response = blockingStub.ping(request);
+    recordSuccess(System.currentTimeMillis() - start);
+  } catch (StatusRuntimeException e) {
+    recordFailure(System.currentTimeMillis() - start, e.toString());
+    logger.warning("RPC failed: " + e.getStatus());
+  }
+}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="23xydngclientbngjmeter">2.3 Xây dựng client bằng JMeter</h3>
+<p>Phần tiếp theo là mình sẽ sử dụng <a href="https://github.com/zalopay-oss/jmeter-grpc-plugin">plugin gRPC</a> cho JMeter của team Performance xây dựng để tạo một client khác bắn phá gRPC server bằng JMeter, sau khi các bạn clone plugin về và làm theo hướng dẫn trên README, thì phần giao diện GUI của JMeter sẽ có thêm một giao diện gRPC Sampler mới giúp các bạn xây dựng kịch bản load test gRPC một cách generic.</p>
+<p>Dưới đây là phần tạo kịch bản bắn phá gRPC server mà thông qua plugin mình xây dựng được:</p>
+<p><img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/grpc-jmeter-plugin.png" alt="grpc-jmeter-plugin" data-action="zoom"></p>
+<p>Ở hình trên mình có khoanh đỏ từ số (1) tới số (6), chi tiết như sau:</p>
+<ol>
+<li>Là một Random configuration được xây dựng sẵn trong JMeter, ngoài ra còn có các Configuration khác như là CSV Configuration giúp các bạn đọc giá trị từ file CSV, v,v...</li>
+<li>Là các edit text dùng để nhập thông số của gRPC server bao gồm hostname, port number, sử dụng ssl hay không ?.</li>
+<li>Config tên package name chứa hàm gRPC mà ta muốn gọi, tên Service định nghĩa trong file .proto</li>
+<li>Input các giá trị như tên hàm gRPC ta muốn gọi, quy định class request truyền vào, đặt timeout (deadline) cho mỗi lời gọi gRPC trong vòng bao nhiêu milisecond, và có thể truyền các giá trị Interceptor gRPC gắn vào phần header dưới dạng các key value (ví dụ: Authorization: Bearer TOKEN) trong phần metaData.</li>
+<li>Khung xây dựng message dùng để gửi đi, ta import các class cần thiết để xây dựng request, đồng thời trả về cục message được xây dựng dưới ngôn ngữ Java, ta có thể truy cập các biến JMeter hoặc các properties của JMeter qua biến <strong>ctx</strong> để lấy giá trị input vào các field của request.</li>
+<li>Lấy ra biến RAMDOM_NUMBER đã được config từ phần (1).</li>
+</ol>
+<p>Ở phần Thread group các bạn cấu hình như sau :</p>
+<p><img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/thread-group.png" alt="thread-group" data-action="zoom"></p>
+<p>Thread group này là phần dùng để quy định các tham số cần thiết để chạy kịch bản:</p>
+<ol>
+<li>Số lượng <strong>Threads</strong> (users) đồng thời chạy bài kịch bản.</li>
+<li>Thời gian từ lúc bắt đầu cho đến khi tạo đủ số lượng threads được gọi là <strong>Ramp-up</strong>.</li>
+<li>Thời gian chạy kịch bản trong bao lâu được gọi là <strong>Duration</strong>.</li>
+</ol>
+<p>Các giá trị trên được nhập vào tên có cú pháp <strong>${__P(</strong>&lt;tên param&gt;<strong>)}</strong>, trong đó các param này được nhập vào giá trị cụ thể khi chúng ta tiến hành chạy load test JMeter bằng chế độ non-gui (dùng command line).</p>
+<p>Sau khi save lại kịch bản trên (lệnh Ctrl + S) dưới file <strong>ping.jmx</strong> (hoặc file khác), ta có thể dùng JMeter để chạy kịch bản này bằng các câu lệnh như sau:</p>
+<pre class="line-numbers  language-sh"><code class="  language-sh"># chạy kịch bản với 16 threads trong 5 phút, với thời gian khởi tạo đủ 16 thread trong vòng 5 giây
+$ jmeter/bin/jmeter.sh -n -t ping.jmx -l result.csv -DTHREADS=16 -DRAMPUP=5 -DDURATION=300
+ 
+# sinh ra report đặt trong folder ping_report
+$ jmeter/bin/jmeter.sh -g result.csv -o ping_report
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="3chyloadtest">3. Chạy load test</h2>
+<p>Sau khi đã xây dựng tất cả các thành phần cần thiết mình sẽ tiến hành chạy load test bằng việc sử dụng Locust và sử dụng JMeter. Mình chạy các bài load test dưới bằng máy tính cá nhân có cấu hình như sau:</p>
+<ul>
+<li><strong>OS</strong>     : Ubuntu 19.04</li>
+<li><strong>RAM</strong> : 16 GB</li>
+<li><strong>CPU</strong>  : Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz</li>
+</ul>
+<p>Trước hết chúng ta cần chạy server gRPC được xây dựng ở phần <strong>2.1</strong> trên, sau khi run thì port gRPC server sẽ là 50051.</p>
+<h3 id="31loadtestvilocust">3.1 Load test với Locust</h3>
+<p>Để chạy Locust thì các bạn cần chạy hai thứ, một là server Locust chạy <a href="https://gitlab.zalopay.vn/thoainh-group/jmeter-vs-locust/tree/master/locust-swarm-client/bin">./run_locust.sh</a>  và hai là chạy service Locust client được xây dựng ở phần 2.2 trên. Sau khi run thì các bạn truy cập đường dẫn <a href="http://localhost:10001/">http://localhost:10001</a> để thấy giao diện hiển thị của Locust, phần giao diện cấu hình có hai thông số là số lượng user chạy đồng thời và số lượng yêu cầu tối đa trong một giây (lưu ý khác biệt với JMeter).</p>
+<p><img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/run-locust.png" alt="run-locust" data-action="zoom"></p>
+<p>Ở trên mình sẽ chạy với 16 users đồng thời, và mỗi user sẽ bắn 1000 request trong một giây, như vậy trong mỗi giây lượng request tối đa mà Locust tạo ra có thể lên đến 16000 request/s, tuy nhiên con số này có thể thấp hơn mức mà chúng ta nhập vào do tài nguyên của máy đáp ứng không đủ, hoặc do service handle không tốt.</p>
+<p>Sau khi chạy trong vòng <strong>300</strong> giây, mình có kết quả như sau: RPS là <strong>8900</strong> request/s, Average time là <strong>1</strong> s, P95 là <strong>6</strong> s</p>
+<p><img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/result-locust.png" alt="result-locust" data-action="zoom"></p>
+<h3 id="32loadtestvijmeter">3.2 Load test với JMeter</h3>
+<p>Tiếp theo mình sẽ chạy cùng ngữ cảnh trên với JMeter, chạy 16 thread, trong vòng 300 giây, thời gian ramp-up là 5 giây bằng lệnh dưới</p>
+<pre class="line-numbers  language-sh"><code class="  language-sh">$ apache-jmeter-5.2.1/bin/jmeter.sh -n -t ping.jmx -l result.csv -DTHREADS=16 -DRAMPUP=5 -DDURATION=300
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>Sau khi chạy xong bằng lệnh trên, chúng ta sẽ có một file result.csv ghi lại metrics trong quá trình chạy, tiếp theo chạy lệnh dưới đây để xuất ra report</p>
+<pre class="line-numbers  language-sh"><code class="  language-sh">$ apache-jmeter-5.2.1/bin/jmeter.sh -g result.csv -o ping_report
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>Phần report kết quả của quá trình load test bằng JMeter dưới đây: Transaction/s (giống với RPS của Locust) là xấp xỉ <strong>15700</strong> request/s, Average time xấp xỉ <strong>1s</strong>, P95 là <strong>2s</strong>.</p>
+<p><img src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/jmeter-report.png" alt="jmeter-report" data-action="zoom"></p>
+<p>Có thể thấy kết quả load test này khá tốt so với Locust khi cùng chạy trong vòng 300s với 16 threads, tiếp theo mình sẽ lập bảng so sánh kết quả giữa Locust với JMeter với số lượng thread khác nhau để tổng kết dưới đây:</p>
+<table>
+<thead>
+<tr>
+<th>Lần</th>
+<th>Cấu hình</th>
+<th>Locust</th>
+<th>JMeter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Thread=16, Duration=300s</td>
+<td>Average=1s, P95=6s, RPS=8900</td>
+<td>Average=1s, P95=2s, RPS=15760</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Thread=32, Duration=300s</td>
+<td>Average=1s, P95=6s, RPS=8936</td>
+<td>Average=3s, P95=5s, RPS=12534</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Thread=64, Duration=300s</td>
+<td>Average=1s, P95=7s, RPS=8978</td>
+<td>Average=4s, P95=10s, RPS=13210</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Thread=128, Duration=300s</td>
+<td>Average=1s, P95=6s, RPS=9386</td>
+<td>Average=7s, P95=17s, RPS=16683</td>
+</tr>
+</tbody>
+</table>
+<p>Có thể thấy kết quả load test của Locust hầu như là không thay đổi và ổn định sau khi tăng số thread, trong khi đó sau khi tăng số thread thì JMeter sẽ tăng response time đáng kể, và số lượng RPS cũng tăng theo.</p>
+<p>Sự khác biệt này có thể giải thích được thông qua cấu tạo của Locust Swarm và JMeter như sau :</p>
+<ul>
+<li>
+<p>Trong Locust Swarm sử dụng Disruptor làm engine để bắn test, mặc dù chúng ta tăng số thread trên màn hình web của Locust nhưng trong thực tế số thread tạo ra dưới máy thực tế cũng chỉ bằng số thread được cấu hình sẵn khi sử dụng Swarm (<a href="https://gitlab.zalopay.vn/thoainh-group/jmeter-vs-locust/blob/master/locust-swarm-client/src/main/java/vn/zalopay/locust/Benchmark.java#L30">chi tiết</a>) hay nói cách khác là số thread vẫn giữ nguyên 16, điều khác biệt là Locust Swarm sử dụng cơ chế non-blocking thread cho nên cùng số thread đó nhưng có thể tạo số lượng concurrent connection cao hơn tương ứng với số user được config trong web của Locust.</p>
+</li>
+<li>
+<p>Trong JMeter thì khác, nếu bạn quy định số thread như thế nào, thì ta cũng sẽ có tương ứng số connection, và ngược lại với Locust thì cơ chế này là blocking thread, cho nên khi tạo một số thread lớn hơn nhiều so với số lõi của CPU, các thread sẽ bị context switch làm đẩy chi phí lên rất nhiều, dẫn đến thời gian một thread tới lượt thực thi và trả response về cho user sẽ tăng cao lên, nên ta có thể thấy khi tăng số thread thì mặc dù RPS bên JMeter có tăng theo nhưng phải chấp nhận chi phí cao hơn bằng việc response time phản hồi chậm hơn đáng kể. Việc sử dụng đúng số thread phù hợp với khả năng của máy khi load test bằng JMeter cũng được trang chủ của JMeter đề cập đến <a href="https://jmeter.apache.org/usermanual/best-practices.html">tại đây</a>.</p>
+</li>
+</ul>
+<h2 id="4ktlun">4. Kết luận</h2>
+<p>Các bạn có thể thấy rằng khi tạo số thread phù hợp mà server đáp ứng được, thì JMeter có lợi thế về Throughtput hơn hẳn, hay là JMeter có thể tạo nhiều request hơn trong cùng một giây so với Locust. Hơn nữa, khi có nhu cầu load test gRPC service, các bạn chỉ cần config host, port của gRPC và cách tạo message đơn giản trên giao diện của JMeter là có thể tạo được một kịch bản load test gRPC rồi, chứ không cần phải viết code thêm và deploy hai service như Locust server và Locust slave.</p>
+<p>Lợi thế hơn của JMeter so với Locust còn được nhận thấy rõ khi bạn muốn chuẩn bị input từ file csv, hoặc là từ giá trị trong response của những lần gọi trước, ở JMeter có các JMeter variable và các component xây dựng sẵn, bạn chỉ cần thêm component vào và lấy giá trị từ các JMeter variable từ component đó để tạo ra request.</p>
+<p>Một điểm cộng nữa của JMeter là report khá chi tiết, các bạn có thể thấy rõ các tham số khác bên cạnh hai tham số chính là response time và through-put như số lượng thread trong khoảng thời gian nào đó, hay tỷ lệ lỗi, chi tiết các lỗi cũng được hiển thị trên report của JMeter.</p>
+<p>Tuy nhiên, do đã nói JMeter sẽ tạo số connection bằng với số thread, cho nên chúng ta muốn giả lập hàng ngàn connection trên một máy sẽ khó hơn nhiều so với Locust.</p>
+<p>Hy vọng các bạn chọn được công cụ thích hợp qua bài viết này, nếu có nhu cầu load test gRPC các bạn hãy xem xét sử dụng <a href="https://github.com/zalopay-oss/jmeter-grpc-plugin">plugin này</a> nhé!</p>
+
+
+        
+        <div class="row u-marginTop30 prev-next">
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/load-testing-grpc-service-voi-jmeter-phan-cuoi/" class="prev-next-link u-block u-marginBottom10">
+            <span class="prev-next-span u-block"><i class="i-arrow-round-prev u-fontSizeLarge arrow-left"></i> Prev article</span>
+            <h5 class="prev-next-title">Load testing gRPC service với JMeter (phần cuối)</h5>
+        </a>
+    </div>
+
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/tim-hieu-ve-circuit-breaker-design-pattern/" class="prev-next-link u-block u-marginBottom10" style="text-align:right">
+            <span class="prev-next-span u-block">Next article <i class="i-arrow-round-next u-fontSizeLarge arrow-right"></i></span>
+            <h5 class="prev-next-title">Tìm hiểu về Circuit Breaker Design Pattern - Netflix Hystrix</h5>
+        </a>
+    </div>
+</div>
+
+        <div class="row mob-share u-marginTop30 u-hide-after-lg">
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/"> <span class="share-title">SHARE</span></a>
+    </div>
+
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/#" class="mapache-share i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/" data-title="Xây dựng gRPC JMeter plugin và so sánh với Locust "> <span class="share-title">TWEET</span></a>
+    </div>
+</div>
+
+        <hr class="post-footer-hr">
+
+        
+
+    </div>
+</article>
+
+
+
+<div class="post-comments-overlay u-absolute0 toggle-comments"></div>
+
+
+
+        </div>
+
+        <aside class="sidebar col-right sidebar-sticky u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+                
+
+    
+    
+
+
+
+    
+<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none;"><div class="sidebar-items u-marginBottom30 u-flexColumn">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Latest Articles</span></h3>
+
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">1</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Tìm hiểu API Gateway (Spring Cloud Gateway &amp; Zuul 2)</h3>
+        <a href="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">2</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Sử dụng RegEx để trích xuất OTP ngân hàng</h3>
+        <a href="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">3</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h3>
+        <a href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">4</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Hướng dẫn tích hợp gRPC-Web vào React JS app</h3>
+        <a href="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">5</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">OTP của VNG được sinh ra như thế nào?</h3>
+        <a href="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</div><div class="sidebar-items u-marginBottom30">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Tag Cloud</span></h3>
+
+        <a href="http://engineering.zalopay.vn/tag/distributed/" title="distributed" class="button tag-button">distributed</a>
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-system/" title="distributed system" class="button tag-button">distributed system</a>
+        <a href="http://engineering.zalopay.vn/tag/backend/" title="backend" class="button tag-button">backend</a>
+        <a href="http://engineering.zalopay.vn/tag/tidb/" title="TiDB" class="button tag-button">TiDB</a>
+        <a href="http://engineering.zalopay.vn/tag/raft/" title="raft" class="button tag-button">raft</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-database/" title="distributed database" class="button tag-button">distributed database</a>
+        <a href="http://engineering.zalopay.vn/tag/golang/" title="golang" class="button tag-button">golang</a>
+        <a href="http://engineering.zalopay.vn/tag/2pc/" title="2PC" class="button tag-button">2PC</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-transaction/" title="distributed transaction" class="button tag-button">distributed transaction</a>
+</div><div class="widget-twitter sidebar-items u-hide">
+        <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder">
+            <span class="u-paddingBottom10 u-inlineBlock">Recents Tweets</span>
+        </h3>
+    </div></div></aside>
+    </div>
+    
+<div id="disqus_thread"><iframe id="dsq-app9155" name="dsq-app9155" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(1).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 395px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://https-engineering-zalopay-vn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+
+</section>
+
+
+<div class="instagram u-overflowHidden u-hide u-relative u-backgroundWhite">
+    <div class="instagram-wrap row"></div>
+    <span class="instagram-name u-absolute"></span>
+</div>
+</main>
+
+    <footer class="footer u-fontSizeSmaller u-fontWeightBold">
+    <div class="footer-links">
+
+        <div class="extreme-container u-flexCenter u-flexColumn">
+            <aside class="follow followMe u-textColorWhite u-fontSize20 u-textAlignCenter">
+                
+                
+                
+            </aside>
+
+            <ul class="footer-menu u-textUppercase u-textAlignCenter u-marginTop20 u-hide"></ul>
+        </div>
+
+
+    </div>
+
+    <div class="footer-copy u-textAlignCenter">
+        © 2020 <a href="http://engineering.zalopay.vn/">ZaloPay Engineering</a>
+        Design with <i class="i-favorite animated infinite pulse" style="color:red;display:inline-block"></i> by <a href="https://goo.gl/Jf1tZe" target="_blank" title="Developer FullStack.">@GodoFredoNinja</a>
+    </div>
+</footer>
+
+    <div class="search u-fixed">
+    <form class="search-form u-relative u-sizeFullWidth u-marginAuto u-marginBottom20">
+        <input id="search-field" class="u-sizeFullWidth u-md-fontSizeBase u-fontSize40 u-fontWeightSemibold" type="text" placeholder="Search...">
+    </form>
+
+    <div id="searchResults" class="search-results u-marginAuto u-sizeFullWidth"></div>
+</div>
+
+    <div class="loadingBar"></div>
+
+    
+
+    <script src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/jquery.min.js"></script>
+
+    
+
+    <script src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/main.js"></script>
+
+    
+<div id="fb-root"></div>
+
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://engineering.zalopay.vn/xay-dung-grpc-jmeter-plugin-va-so-sanh-voi-locust/';
+        this.page.identifier = 'ghost-5ea66518e6b9c70001a0863e';
+    };
+
+    var $showComments = $('.post-comments-show');
+
+    (function(d, s, id) {
+        if (typeof disqusShortName !== 'undefined') {
+            $('.mapache-disqus').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js = d.createElement(s);
+            js.src = 'https://'+disqusShortName+'.disqus.com/embed.js';
+            js.async = true;
+
+            js.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(js);
+        } else if (typeof facebookLocaleComments !== 'undefined') {
+            $('.mapache-facebook').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://connect.facebook.net/'+facebookLocaleComments+'/sdk.js#xfbml=1&version=v3.1';
+            js.async = true;
+            fjs.parentNode.insertBefore(js, fjs);
+        } else {
+            $showComments.remove();
+        }
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+    <script>
+        Prism.plugins.autoloader.languages_path = 'http://engineering.zalopay.vn/assets/scripts/components/';
+        $('.post-body').find('pre').addClass('line-numbers');
+    </script>
+
+    <script>WebFontConfig ={google:{families:['Ruda:400,700,900','Merriweather:300,400,700','Fira+Mono:400']}};(function(){var wf=document.createElement('script');wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';wf.type='text/javascript';wf.async='true';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(wf,s);})();</script>
+
+
+<iframe style="display: none;" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(2).html"></iframe><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(3).html"></iframe><div id="xzAPzLr-1603449104567" class="" style="display: block !important;"><iframe id="HPQIcLp-1603449104568" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(4).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; position: static !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 350px !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; display: none !important; height: 120px !important;"></iframe><iframe id="a67rULi-1603449104570" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(5).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; z-index: 1000001 !important; cursor: auto !important; float: none !important; pointer-events: auto !important; box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 10px 0px !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; width: 60px !important; min-width: 60px !important; max-width: 60px !important; border-radius: 50% !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; margin: 0px !important; top: auto !important; bottom: 20px !important; right: 20px !important; left: auto !important; display: block !important;"></iframe><iframe id="WbuEIFK-1603449104571" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(6).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; display: none !important; z-index: 1000003 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; top: auto !important; bottom: 60px !important; right: 15px !important; left: auto !important; width: 21px !important; max-width: 21px !important; min-width: 21px !important; height: 21px !important; max-height: 21px !important; min-height: 21px !important;"></iframe><iframe id="pJvc6SO-1603449104747" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(7).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; bottom: 30px !important; top: auto !important; right: 0px !important; left: auto !important; width: 124px !important; max-width: 124px !important; min-width: 124px !important; height: 95px !important; max-height: 95px !important; min-height: 95px !important; z-index: 1000002 !important; margin: 0px !important; display: none !important;"></iframe><div class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 100% !important; display: none !important; z-index: 1000001 !important; cursor: move !important; float: left !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="i1ROg2X-1603449104567" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 6px !important; height: 100% !important; display: block !important; z-index: 999998 !important; cursor: w-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="osIHM5q-1603449104567" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: 0px !important; bottom: auto !important; left: auto !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 6px !important; display: block !important; z-index: 999998 !important; cursor: n-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="euzvRzN-1603449104567" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 12px !important; height: 12px !important; display: block !important; z-index: 999998 !important; cursor: nw-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><iframe id="ZHGs7Ya-1603449105640" src="./Xây dựng gRPC JMeter plugin và so sánh với Locust_files/saved_resource(8).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 378px !important; height: 876px !important; display: none !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; bottom: 100px !important; top: auto !important; right: 20px !important; left: auto !important;"></iframe></div><div id="eJOY__extension_root" class="eJOY__extension_root_class" style="all: unset;"></div></body></html>

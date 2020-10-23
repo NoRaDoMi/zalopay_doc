@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<!-- saved from url=(0078)https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/ -->
+<html lang="en" class="wf-ruda-n4-active wf-ruda-n7-active wf-ruda-n9-active wf-merriweather-n3-active wf-merriweather-n4-active wf-merriweather-n7-active wf-firamono-n4-active wf-active" style="transform: none;"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><style type="text/css" id="dark-mode-custom-style"></style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" type="text/css" href="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/main.css">
+
+    <link rel="shortcut icon" href="https://engineering.zalopay.vn/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/amp/">
+    
+    <meta property="og:site_name" content="ZaloPay Engineering">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS">
+    <meta property="og:description" content="ZAS là hệ thống ghi nhận các giao dịch dưới dạng các bút toán theo nghiệp vụ kế toán. Một bút toán được ghi nhận gồm nhiều tài khoản tham gia. Trên một tài khoản bất kỳ, các bút toán cho tài khoản này phải được ghi nhận vào ZAS theo trình tự thời gian (giao dịch xảy ra trước được ghi nhận trước).">
+    <meta property="og:url" content="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/">
+    <meta property="og:image" content="http://engineering.zalopay.vn/content/images/2019/12/loseweightrunfaster.png">
+    <meta property="article:published_time" content="2019-12-27T09:46:47.000Z">
+    <meta property="article:modified_time" content="2019-12-27T09:46:47.000Z">
+    <meta property="article:tag" content="database">
+    <meta property="article:tag" content="batch processing">
+    <meta property="article:tag" content="optimization">
+    <meta property="article:tag" content="algorithm">
+    <meta property="article:tag" content="graph">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS">
+    <meta name="twitter:description" content="ZAS là hệ thống ghi nhận các giao dịch dưới dạng các bút toán theo nghiệp vụ kế toán. Một bút toán được ghi nhận gồm nhiều tài khoản tham gia. Trên một tài khoản bất kỳ, các bút toán cho tài khoản này phải được ghi nhận vào ZAS theo trình tự thời gian (giao dịch xảy ra trước được ghi nhận trước).">
+    <meta name="twitter:url" content="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/">
+    <meta name="twitter:image" content="http://engineering.zalopay.vn/content/images/2019/12/loseweightrunfaster.png">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Khang Le">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="database, batch processing, optimization, algorithm, graph">
+    <meta property="og:image:width" content="673">
+    <meta property="og:image:height" content="448">
+    
+    <script type="text/javascript" async="" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/analytics.js"></script><script src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/webfont.js" type="text/javascript" async=""></script><script async="" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/default" charset="UTF-8" crossorigin="*"></script><script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ZaloPay Engineering",
+        "logo": "http://engineering.zalopay.vn/favicon.ico"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Khang Le",
+        "url": "http://engineering.zalopay.vn/author/khang/",
+        "sameAs": []
+    },
+    "headline": "Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS",
+    "url": "http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/",
+    "datePublished": "2019-12-27T09:46:47.000Z",
+    "dateModified": "2019-12-27T09:46:47.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://engineering.zalopay.vn/content/images/2019/12/loseweightrunfaster.png",
+        "width": 673,
+        "height": 448
+    },
+    "keywords": "database, batch processing, optimization, algorithm, graph",
+    "description": "ZAS là hệ thống ghi nhận các giao dịch dưới dạng các bút toán theo nghiệp vụ kế toán. Một bút toán được ghi nhận gồm nhiều tài khoản tham gia. Trên một tài khoản bất kỳ, các bút toán cho tài khoản này phải được ghi nhận vào ZAS theo trình tự thời gian (giao dịch xảy ra trước được ghi nhận trước).",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://engineering.zalopay.vn/"
+    }
+}
+    </script>
+
+    <script src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/ghost-sdk.min.js"></script>
+<script>
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "404c2ad841f6"
+});
+</script>
+    <meta name="generator" content="Ghost 2.9">
+    <link rel="alternate" type="application/rss+xml" title="ZaloPay Engineering" href="http://engineering.zalopay.vn/rss/">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141214835-1');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e1d2d447e39ea1242a474e4/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<link rel="stylesheet" href="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/css" media="all"><script src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/embed.js" data-timestamp="1603449029246"></script><style type="text/css">@keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-moz-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}@-webkit-keyframes tawkMaxOpen{0%{opacity:0;transform:translate(0, 30px);;}to{opacity:1;transform:translate(0, 0px);}}#vQPeVaT-1603449029307{outline:none!important;visibility:visible!important;resize:none!important;box-shadow:none!important;overflow:visible!important;background:none!important;opacity:1!important;filter:alpha(opacity=100)!important;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity1)!important;-moz-opacity:1!important;-khtml-opacity:1!important;top:auto!important;right:10px!important;bottom:90px!important;left:auto!important;position:fixed!important;border:0!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;padding:0!important;margin:0!important;-moz-transition-property:none!important;-webkit-transition-property:none!important;-o-transition-property:none!important;transition-property:none!important;transform:none!important;-webkit-transform:none!important;-ms-transform:none!important;width:auto!important;height:auto!important;display:none!important;z-index:2000000000!important;background-color:transparent!important;cursor:auto!important;float:none!important;border-radius:unset!important;pointer-events:auto!important}#OyWypk3-1603449029308.open{animation : tawkMaxOpen .25s ease!important;}</style><link rel="prefetch" as="style" href="https://c.disquscdn.com/next/embed/styles/lounge.a8dc02def3107413d47189b1bce61bd9.css"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/common.bundle.847783fd9a0d1b9b80a706571a35d786.js"><link rel="prefetch" as="script" href="https://c.disquscdn.com/next/embed/lounge.bundle.f86a840f3451e5487a277f1443585291.js"><link rel="prefetch" as="script" href="https://disqus.com/next/config.js"><style id="theia-sticky-sidebar-stylesheet-TSS">.theiaStickySidebar:after {content: ""; display: table; clear: both;}</style><script src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/alfalfalfa.0823c767a3bc925f628afd9bed26c958.js" async="" charset="UTF-8"></script></head>
+<body class="is-article clickup-chrome-ext_installed" data-page="http://engineering.zalopay.vn" style="transform: none;" cz-shortcut-listen="true">
+
+    <header class="header u-sizeFullWidth u-bgColor">
+    <div class="header-wrap u-flexCenter u-relative">
+
+        <a class="header-logo u-inlineBlock u-flex0" href="http://engineering.zalopay.vn/">
+            <span class="u-fontSizeLarge u-fontWeightBolder">ZaloPay Engineering</span>
+        </a>
+
+        <nav class="nav u-flex u-flex1 u-paddingLeft20 u-flexCenter u-hide-before-md"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="header-left u-flex0 u-flex u-flexEnd u-fontSize21">
+
+            
+            
+
+            <div class="followMe follow-more u-hide-before-md"></div>
+
+
+            <a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="follow-toggle u-relative u-fontSizeLarge u-hide u-hide-before-md i-more"></a>
+            <span class="header-line u-hide-before-md"></span>
+            <a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="search-toggle u-relative i-search"></a>
+            <a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="menu--toggle u-relative u-hide-after-md"><span></span><span></span><span></span></a>
+
+        </div>
+    </div>
+
+    <aside class="sideNav u-absolute0 u-hide-after-md u-bgColor">
+    <div class="sideNav-wrap u-absolute0">
+        <nav class="sideNav-menu"><ul class="u-unstyled u-flex1">
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Home</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/database/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Databases</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/distributed-system/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Distributed</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/talks/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Talks</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/programming/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Programming</a>
+        </li>
+        <li class="mapache-tracking">
+            <a href="http://engineering.zalopay.vn/tag/productivity/" class="navigation-link u-fontSize15 u-fontWeightSemibold u-block ">Productivity</a>
+        </li>
+</ul>
+</nav>
+
+        <div class="sideNav-follow followMe u-fontSize20 u-paddingTop20 u-paddingLeft20 u-paddingRight20">
+            
+            
+        </div>
+    </div>
+</aside>
+
+</header>
+
+    <main class="main u-relative" style="transform: none;">
+<section class="post extreme-container u-marginTop30 u-marginBottom40" style="transform: none;">
+    <div class="row" style="transform: none;">
+        
+        <div class="col-left" style="transform: none;">
+            
+<div class="post-header">
+    
+        <div class="post-primary-tag u-marginBottom10 u-hide u-fontWeightBolder cover-category">
+            <a href="https://engineering.zalopay.vn/tag/database/" title="database">database</a>
+        </div>
+    
+
+    <h1 class="post-title u-fontSize40 u-contentTitle u-md-fontSizeLarger">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h1>
+
+        <p class="post-excerpt u-fontSize20 u-paddingTop10">ZAS là hệ thống ghi nhận các giao dịch dưới dạng các bút toán theo nghiệp vụ kế toán. Một bút toán được ghi nhận gồm nhiều tài khoản tham gia. Trên một tài khoản bất kỳ, các bút toán cho tài khoản này phải được ghi nhận vào ZAS theo trình tự thời gian (giao dịch xảy ra trước được ghi nhận trước).</p>
+</div>
+
+
+            
+<div class="post-author u-flex u-flexCenter u-marginTop20">
+    <div class="u-flex0">
+        <a href="https://engineering.zalopay.vn/author/khang/" style="background-image:url()" class="avatar-image avatar-image--smaller u-backgroundSizeCover u-relative no-avatar"></a>
+    </div>
+
+    <div class="u-paddingLeft15 u-textColorNormal u-flex1 u-fontSizeSmaller u-lineHeight1">
+
+        <div class="u-block">
+            <time class="datetime" datetime=" 2019-12-27 ">Published 10 months ago</time>
+            <span class="point">—</span>
+            <span class="readingTime">4 min read</span>
+        </div>
+
+
+        <div class="u-block u-paddingTop5">
+            By <a href="https://engineering.zalopay.vn/author/khang/" class="mapache-tracking link link--underline u-fontWeightBold u-textColorDarker" title="Posts by Khang Le" data-event-category="Article" data-event-action="Author - Khang Le" data-event-label="Profile" data-event-non-interaction="1">Khang Le</a>
+
+            
+            
+        </div>
+
+    </div>
+</div>
+
+
+
+                <figure class="post-image u-block u-marginAuto u-maxWidth1000">
+                    <img src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/loseweightrunfaster.png" class="u-block u-marginAuto" alt="Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS" data-action="zoom">
+                </figure>
+
+
+            
+<article class="post-body u-relative" style="transform: none;">
+    <div class="sharePost u-textAlignCenter u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+    
+    
+    
+    
+    
+    
+<div class="theiaStickySidebar" style="padding-top: 1px; padding-bottom: 1px; position: static; transform: none; top: 0px; left: 335px;"><a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share button--circle i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/"></a><a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share button--circle i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/" data-title="Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS "></a><a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share button--circle i-reddit bg-reddit u-fontSize20" data-share="reddit" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/"></a><a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share button--circle i-linkedin bg-linkedin u-fontSize20" data-share="linkedin" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/"></a><a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share button--circle i-pinterest bg-pinterest u-fontSize20" data-share="pinterest" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/" data-title="Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS"></a></div></div>
+
+    <div class="post-body-wrap">
+        <h4 id="iabstract">I. ABSTRACT:</h4>
+<p><strong>ZAS</strong> là hệ thống ghi nhận các giao dịch dưới dạng các bút toán theo nghiệp vụ kế toán. Một bút toán được ghi nhận gồm nhiều tài khoản tham gia. Trên một tài khoản bất kỳ, các bút toán cho tài khoản này phải được ghi nhận vào ZAS theo trình tự thời gian (giao dịch xảy ra trước được ghi nhận trước).</p>
+<p><strong>Bookkeeping</strong> là hệ thống chuyển đổi giao dịch thành bút toán để ghi vào ZAS.</p>
+<p>Trong quá trình migrate dữ liệu từ hệ thống cũ sang hệ thống mới. Bookkeeping đọc dữ liệu trong quá khứ từ Data Platform, chuyển đổi thành bút toán và ghi nhận vào ZAS.</p>
+<p><img src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/Untitled_Diagram.png" alt="Untitled_Diagram" data-action="zoom"></p>
+<h4 id="iivn">II. VẤN ĐỀ:</h4>
+<p>Cách đổ data hiện tại đang ghi tuần tự từng bút toán theo thời gian. Thời gian ghi nhận 1 bút toán ở ZAS xấp xĩ 30ms =&gt; thời gian đổ toàn bộ giao dịch của 1 ngày (150,000 giao dịch) xấp xỉ 1h15p. Thời gian đổ dữ liệu lâu sẽ gây ảnh hưởng việc phát hiện lỗi. Ngoài ra còn có nhu cầu đổ lại dữ liệu bị miss, nên cần cải thiện thời gian đổ dữ liệu.</p>
+<h4 id="iiiphtbiubiton">III. PHÁT BIỂU BÀI TOÁN:</h4>
+<p>Cần thiết kế cách đổ dữ liệu để cải thiện tốc độ. Yêu cầu:</p>
+<ul>
+<li>Đáp ứng được đặt trưng của ZAS (cùng 1 tài khoản, bút toán phải ghi theo thời gian)</li>
+<li>Thời gian đổ dữ liêu 1 ngày dưới 30 phút</li>
+</ul>
+<h4 id="ivhngtipcn">IV. HƯỚNG TIẾP CẬN:</h4>
+<p>Chia dữ liệu thành các cluster, mỗi cluster sẽ được đổ song song nhau. Cách chia cluster dựa trên userId và appUser của mỗi giao dịch. Các giao dịch có userId và appUser intersect nhau sẽ cùng nằm trong 1 cluster. Bookkeeping sẽ đọc data dựa trên các cluster này, xử lý và ghi vào ZAS.</p>
+<p>Với hướng tiếp cận này, cần giải thuật chia các giao dịch vào các cluster hợp lý.</p>
+<p>Ví dụ:<br>
+Lấy 1 mẩu dữ liệu hiện tại có cấu trúc như sau:</p>
+<p>Input:</p>
+<table>
+<thead>
+<tr>
+<th>transId</th>
+<th>userId</th>
+<th>appUser</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>191201000001</td>
+<td>191201000001</td>
+<td>191201000002</td>
+</tr>
+<tr>
+<td>191201000002</td>
+<td>191201000002</td>
+<td>191201000004</td>
+</tr>
+<tr>
+<td>191201000003</td>
+<td>191201000005</td>
+<td>191201000004</td>
+</tr>
+<tr>
+<td>191201000004</td>
+<td>191201000006</td>
+<td>191201000002</td>
+</tr>
+<tr>
+<td>191201000005</td>
+<td>191201000007</td>
+<td>191201000001</td>
+</tr>
+<tr>
+<td>191201000006</td>
+<td>191201000003</td>
+<td>191201000010</td>
+</tr>
+<tr>
+<td>191201000007</td>
+<td>191201000003</td>
+<td>191201000011</td>
+</tr>
+<tr>
+<td>191201000008</td>
+<td>191201000007</td>
+<td>191201000011</td>
+</tr>
+<tr>
+<td>191201000009</td>
+<td>191201000012</td>
+<td>191201000013</td>
+</tr>
+<tr>
+<td>191201000010</td>
+<td>191201000012</td>
+<td>191201000014</td>
+</tr>
+</tbody>
+</table>
+<p>Output:</p>
+<table>
+<thead>
+<tr>
+<th>transId</th>
+<th>cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>191201000001</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000002</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000003</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000004</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000005</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000006</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000007</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000008</td>
+<td>1</td>
+</tr>
+<tr>
+<td>191201000009</td>
+<td>2</td>
+</tr>
+<tr>
+<td>191201000010</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h4 id="vphngphp">V. PHƯƠNG PHÁP</h4>
+<p>Bài toán có thể được biểu diễn dưới dạng đồ thị, mỗi đỉnh của đồ thị là một userID, 1 giao dịch là 1 đường đi giữa 2 đỉnh. Vấn đề có thể được đưa về bài toán cơ bản trong đồ thị: Tìm tất cả thành phần liên thông của đồ thị.</p>
+<p>Ví dụ:</p>
+<p><img src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/image.png" alt="image" data-action="zoom"></p>
+<p>Trong hình trên, chúng ta có 12 users (a -&gt; k) là các node, các giao dịch là đường đi giữa các node. Chúng ta có thể chia thành 4 cluster, cluster 1 gồm (a, b, c), cluster 2 gồm (d, e, f), cluster 3 gồm (g, h, i, j, l) và cluster 4 gồm (k).</p>
+<p><strong>Lời giải</strong>:</p>
+<ul>
+<li>Biểu diễn đồ thị bằng danh sách kề, đáp ứng được nhu cầu bài toán, tiết kiệm bộ nhớ</li>
+<li>Dùng Depth First Search (DFS) để tìm tất cả thành phần liên thông của đồ thị</li>
+</ul>
+<p>Cơ bản lý thuyết đồ thị, DFS, BFS:</p>
+<ul>
+<li><a href="https://www.geeksforgeeks.org/graph-and-its-representations/">https://www.geeksforgeeks.org/graph-and-its-representations/</a></li>
+<li><a href="https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/">https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/</a></li>
+<li><a href="https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/">https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/</a></li>
+</ul>
+<p>Bài toán và phương pháp: <a href="https://www.geeksforgeeks.org/program-to-count-number-of-connected-components-in-an-undirected-graph/">https://www.geeksforgeeks.org/program-to-count-number-of-connected-components-in-an-undirected-graph/</a></p>
+<p><strong>Bài toán phụ</strong>: Sau khi đã tìm được tất cả các cluster, một số cluster có rất ít giao dịch, không hiệu quả cho việc đổ dữ liệu riêng ở các cluster này. Cần nhóm các cluster lại để các cluster đều có một số lượng giao dịch nhất định, hiệu quả cho việc đổ theo batch.</p>
+<p><strong>Giải pháp</strong> cho bài toán phụ: Sort các cluster theo số lượng giao dịch, duyệt và nhóm các cluster lại để mỗi cluster đều có trên 1000 giao dịch.</p>
+<h4 id="vithnghim">VI. THỬ NGHIỆM</h4>
+<p>Thử nghiệm trên dữ liệu của TPE ngày 1, kết quả:</p>
+<ul>
+<li>Phân thành 91 cluster, cluster lớn nhất 27000 giao dịch, cluster nhỏ nhất 1000 giao dịch</li>
+<li>Tốc độ xử lý và đổ dữ liệu qua zas còn 5 phút</li>
+</ul>
+<p>Ví dụ 1 đoạn kết quả data chạy ngày 1 của hệ thống:</p>
+<table>
+<thead>
+<tr>
+<th>ClusterID</th>
+<th>Numer of trans</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>35370</td>
+<td>1764</td>
+</tr>
+<tr>
+<td>35368</td>
+<td>1668</td>
+</tr>
+<tr>
+<td>35367</td>
+<td>1574</td>
+</tr>
+<tr>
+<td>35369</td>
+<td>1376</td>
+</tr>
+<tr>
+<td>35338</td>
+<td>1333</td>
+</tr>
+<tr>
+<td>35347</td>
+<td>1328</td>
+</tr>
+<tr>
+<td>35340</td>
+<td>1321</td>
+</tr>
+<tr>
+<td>35364</td>
+<td>1320</td>
+</tr>
+<tr>
+<td>35353</td>
+<td>1316</td>
+</tr>
+<tr>
+<td>35339</td>
+<td>1312</td>
+</tr>
+<tr>
+<td>35305</td>
+<td>1310</td>
+</tr>
+<tr>
+<td>35346</td>
+<td>1304</td>
+</tr>
+<tr>
+<td>35341</td>
+<td>1302</td>
+</tr>
+<tr>
+<td>35304</td>
+<td>1301</td>
+</tr>
+<tr>
+<td>35319</td>
+<td>1299</td>
+</tr>
+<tr>
+<td>35308</td>
+<td>1297</td>
+</tr>
+</tbody>
+</table>
+
+
+        
+<div class="post-tags u-marginTop30">
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/batch-processing/" title="batch processing" class="button tag-button">batch processing</a>
+        <a href="http://engineering.zalopay.vn/tag/optimization/" title="optimization" class="button tag-button">optimization</a>
+        <a href="http://engineering.zalopay.vn/tag/algorithm/" title="algorithm" class="button tag-button">algorithm</a>
+        <a href="http://engineering.zalopay.vn/tag/graph/" title="graph" class="button tag-button">graph</a>
+</div>
+
+
+        <div class="row u-marginTop30 prev-next">
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/tidb-synchronization/" class="prev-next-link u-block u-marginBottom10">
+            <span class="prev-next-span u-block"><i class="i-arrow-round-prev u-fontSizeLarge arrow-left"></i> Prev article</span>
+            <h5 class="prev-next-title">TiDB Synchronization</h5>
+        </a>
+    </div>
+
+    <div class="col s12 m6">
+        <a href="https://engineering.zalopay.vn/transaction-message/" class="prev-next-link u-block u-marginBottom10" style="text-align:right">
+            <span class="prev-next-span u-block">Next article <i class="i-arrow-round-next u-fontSizeLarge arrow-right"></i></span>
+            <h5 class="prev-next-title">Transaction Message</h5>
+        </a>
+    </div>
+</div>
+
+        <div class="row mob-share u-marginTop30 u-hide-after-lg">
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share i-facebook bg-facebook u-fontSize20" data-share="facebook" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/"> <span class="share-title">SHARE</span></a>
+    </div>
+
+    <div class="col s6">
+        <a href="https://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/#" class="mapache-share i-twitter bg-twitter u-fontSize20" data-share="twitter" data-url="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/" data-title="Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS "> <span class="share-title">TWEET</span></a>
+    </div>
+</div>
+
+        <hr class="post-footer-hr">
+
+        
+
+    </div>
+</article>
+
+
+
+<div class="post-comments-overlay u-absolute0 toggle-comments"></div>
+
+
+
+        </div>
+
+        <aside class="sidebar col-right sidebar-sticky u-hide-before-lg" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
+                
+
+    
+    
+
+
+
+    
+<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none; top: 0px; left: 1183px;"><div class="sidebar-items u-marginBottom30 u-flexColumn">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Latest Articles</span></h3>
+
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">1</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Tìm hiểu API Gateway (Spring Cloud Gateway &amp; Zuul 2)</h3>
+        <a href="http://engineering.zalopay.vn/tim-hieu-api-gateway-spring-cloud-gateway-zuul-2/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">2</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Sử dụng RegEx để trích xuất OTP ngân hàng</h3>
+        <a href="http://engineering.zalopay.vn/su-dung-regex-de-trich-xuat-otp-ngan-hang/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">3</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS</h3>
+        <a href="http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">4</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">Hướng dẫn tích hợp gRPC-Web vào React JS app</h3>
+        <a href="http://engineering.zalopay.vn/using-grpc-web-to-call-api-from-grpc-server-in-react-application/" class="u-absolute0 u-zindex2"></a>
+    </div>
+    <div class="sidebar-post mapache-tracking u-relative u-flex" data-event-category="Author" data-event-action="Sidebar - Latest articles" data-event-label="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" data-event-non-interaction="1">
+        <span class="u-flex0 sidebar-border u-flexCenter u-fontSize40 u-fontWeightSemibold">5</span>
+        <h3 class="u-padding15 u-flex1 u-fontSize15 u-fontWeightBold u-lineHeightTight">OTP của VNG được sinh ra như thế nào?</h3>
+        <a href="http://engineering.zalopay.vn/otp-cua-vng-duoc-sinh-ra-nhu-the-nao/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</div><div class="sidebar-items u-marginBottom30">
+    <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder"><span class="u-paddingBottom10 u-inlineBlock">Tag Cloud</span></h3>
+
+        <a href="http://engineering.zalopay.vn/tag/distributed/" title="distributed" class="button tag-button">distributed</a>
+        <a href="http://engineering.zalopay.vn/tag/database/" title="database" class="button tag-button">database</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-system/" title="distributed system" class="button tag-button">distributed system</a>
+        <a href="http://engineering.zalopay.vn/tag/backend/" title="backend" class="button tag-button">backend</a>
+        <a href="http://engineering.zalopay.vn/tag/tidb/" title="TiDB" class="button tag-button">TiDB</a>
+        <a href="http://engineering.zalopay.vn/tag/raft/" title="raft" class="button tag-button">raft</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-database/" title="distributed database" class="button tag-button">distributed database</a>
+        <a href="http://engineering.zalopay.vn/tag/golang/" title="golang" class="button tag-button">golang</a>
+        <a href="http://engineering.zalopay.vn/tag/2pc/" title="2PC" class="button tag-button">2PC</a>
+        <a href="http://engineering.zalopay.vn/tag/distributed-transaction/" title="distributed transaction" class="button tag-button">distributed transaction</a>
+</div><div class="widget-twitter sidebar-items u-hide">
+        <h3 class="sidebar-title u-fontSizeBase u-textColorDarker u-marginBottom20 u-fontWeightBolder">
+            <span class="u-paddingBottom10 u-inlineBlock">Recents Tweets</span>
+        </h3>
+    </div></div></aside>
+    </div>
+    
+<div id="disqus_thread"><iframe id="dsq-app8773" name="dsq-app8773" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(1).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 395px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://https-engineering-zalopay-vn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                            
+
+</section>
+
+
+
+<section class="post-related u-backgroundWhite u-paddingTop30 u-paddingBottom20 u-overflowHidden">
+    <div class="extreme-container">
+        <div class="row story-card">
+
+
+            <div class="col s12 m6 l4">
+                <article class="story u-flex u-relative story--grid ">
+    <div class="story-image u-relative u-overflowHidden u-backgroundColorGrayLight">
+        <a href="https://engineering.zalopay.vn/giai-quyet-bai-toan-sql-ddl/" class="story-image-lazy u-absolute0 u-block story-img-bg image-hover u-backgroundSizeCover" data-original="/content/images/2019/11/6b95e-d6feb-whatisddldml.png" style="background-image: url(&quot;/content/images/2019/11/6b95e-d6feb-whatisddldml.png&quot;);"></a>
+
+    </div>
+
+    <div class="story-body u-flexColumn u-marginTop20 u-relative">
+        <div class="flow-meta u-fontSizeSmallest u-flexCenter">
+            
+                <a href="https://engineering.zalopay.vn/tag/backend/" class="link--underline u-fontWeightBolder u-textUppercase story-category u-relative zindex4">backend</a>
+                <span class="point">/</span>
+            
+
+            <span><time class="datetime" datetime=" 2019-11-27 ">a year ago</time></span>
+        </div>
+
+        <h2 class="u-contentTitle u-fontSize20 u-lineHeightTight u-marginBottom10">
+            <a href="https://engineering.zalopay.vn/giai-quyet-bai-toan-sql-ddl/" class="u-relative zindex4">Giải quyết bài toán thực thi SQL DDL</a>
+        </h2>
+
+
+        <a href="https://engineering.zalopay.vn/giai-quyet-bai-toan-sql-ddl/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</article>
+            </div>
+
+
+            <div class="col s12 m6 l4">
+                <article class="story u-flex u-relative story--grid ">
+    <div class="story-image u-relative u-overflowHidden u-backgroundColorGrayLight">
+        <a href="https://engineering.zalopay.vn/xay-dung-sql-parser-service/" class="story-image-lazy u-absolute0 u-block story-img-bg image-hover u-backgroundSizeCover" data-original="/content/images/2019/11/flow-ZPD-1.png" style="background-image: url(&quot;/content/images/2019/11/flow-ZPD-1.png&quot;);"></a>
+
+    </div>
+
+    <div class="story-body u-flexColumn u-marginTop20 u-relative">
+        <div class="flow-meta u-fontSizeSmallest u-flexCenter">
+            
+                <a href="https://engineering.zalopay.vn/tag/backend/" class="link--underline u-fontWeightBolder u-textUppercase story-category u-relative zindex4">backend</a>
+                <span class="point">/</span>
+            
+
+            <span><time class="datetime" datetime=" 2019-11-25 ">a year ago</time></span>
+        </div>
+
+        <h2 class="u-contentTitle u-fontSize20 u-lineHeightTight u-marginBottom10">
+            <a href="https://engineering.zalopay.vn/xay-dung-sql-parser-service/" class="u-relative zindex4">Xây dựng SQL service sử dụng TiKV làm storage</a>
+        </h2>
+
+
+        <a href="https://engineering.zalopay.vn/xay-dung-sql-parser-service/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</article>
+            </div>
+
+
+            <div class="col s12 m6 l4">
+                <article class="story u-flex u-relative story--grid ">
+    <div class="story-image u-relative u-overflowHidden u-backgroundColorGrayLight">
+        <a href="https://engineering.zalopay.vn/tidb-synchronization/" class="story-image-lazy u-absolute0 u-block story-img-bg image-hover u-backgroundSizeCover" data-original="https://images.unsplash.com/photo-1504639725590-34d0984388bd?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExNzczfQ" style="background-image: url(&quot;https://images.unsplash.com/photo-1504639725590-34d0984388bd?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExNzczfQ&quot;);"></a>
+
+    </div>
+
+    <div class="story-body u-flexColumn u-marginTop20 u-relative">
+        <div class="flow-meta u-fontSizeSmallest u-flexCenter">
+            
+                <a href="https://engineering.zalopay.vn/tag/tidb/" class="link--underline u-fontWeightBolder u-textUppercase story-category u-relative zindex4">TiDB</a>
+                <span class="point">/</span>
+            
+
+            <span><time class="datetime" datetime=" 2019-12-03 ">a year ago</time></span>
+        </div>
+
+        <h2 class="u-contentTitle u-fontSize20 u-lineHeightTight u-marginBottom10">
+            <a href="https://engineering.zalopay.vn/tidb-synchronization/" class="u-relative zindex4">TiDB Synchronization</a>
+        </h2>
+
+
+        <a href="https://engineering.zalopay.vn/tidb-synchronization/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</article>
+            </div>
+
+
+            <div class="col s12 m6 l4">
+                <article class="story u-flex u-relative story--grid ">
+    <div class="story-image u-relative u-overflowHidden u-backgroundColorGrayLight">
+        <a href="https://engineering.zalopay.vn/consensus-raft-algorithm/" class="story-image-lazy u-absolute0 u-block story-img-bg image-hover u-backgroundSizeCover" data-original="/content/images/2019/01/Screenshot-from-2019-01-21-14-56-19.png" style="background-image: url(&quot;/content/images/2019/01/Screenshot-from-2019-01-21-14-56-19.png&quot;);"></a>
+
+    </div>
+
+    <div class="story-body u-flexColumn u-marginTop20 u-relative">
+        <div class="flow-meta u-fontSizeSmallest u-flexCenter">
+            
+                <a href="https://engineering.zalopay.vn/tag/raft/" class="link--underline u-fontWeightBolder u-textUppercase story-category u-relative zindex4">raft</a>
+                <span class="point">/</span>
+            
+
+            <span><time class="datetime" datetime=" 2019-01-21 ">2 years ago</time></span>
+        </div>
+
+        <h2 class="u-contentTitle u-fontSize20 u-lineHeightTight u-marginBottom10">
+            <a href="https://engineering.zalopay.vn/consensus-raft-algorithm/" class="u-relative zindex4">Tìm hiểu bài toán đồng thuận trong hệ thống phân tán (Phần 3)</a>
+        </h2>
+
+
+        <a href="https://engineering.zalopay.vn/consensus-raft-algorithm/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</article>
+            </div>
+
+
+            <div class="col s12 m6 l4">
+                <article class="story u-flex u-relative story--grid ">
+    <div class="story-image u-relative u-overflowHidden u-backgroundColorGrayLight">
+        <a href="https://engineering.zalopay.vn/consensus-2pc-algorithm/" class="story-image-lazy u-absolute0 u-block story-img-bg image-hover u-backgroundSizeCover" data-original="/content/images/2019/01/HomeBG-2.jpg" style="background-image: url(&quot;/content/images/2019/01/HomeBG-2.jpg&quot;);"></a>
+
+    </div>
+
+    <div class="story-body u-flexColumn u-marginTop20 u-relative">
+        <div class="flow-meta u-fontSizeSmallest u-flexCenter">
+            
+                <a href="https://engineering.zalopay.vn/tag/2pc/" class="link--underline u-fontWeightBolder u-textUppercase story-category u-relative zindex4">2PC</a>
+                <span class="point">/</span>
+            
+
+            <span><time class="datetime" datetime=" 2019-01-21 ">2 years ago</time></span>
+        </div>
+
+        <h2 class="u-contentTitle u-fontSize20 u-lineHeightTight u-marginBottom10">
+            <a href="https://engineering.zalopay.vn/consensus-2pc-algorithm/" class="u-relative zindex4">Tìm hiểu bài toán đồng thuận trong hệ thống phân tán (Phần 2)</a>
+        </h2>
+
+
+        <a href="https://engineering.zalopay.vn/consensus-2pc-algorithm/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</article>
+            </div>
+
+
+            <div class="col s12 m6 l4">
+                <article class="story u-flex u-relative story--grid ">
+    <div class="story-image u-relative u-overflowHidden u-backgroundColorGrayLight">
+        <a href="https://engineering.zalopay.vn/consensus/" class="story-image-lazy u-absolute0 u-block story-img-bg image-hover u-backgroundSizeCover" data-original="/content/images/2019/01/1_vWdD55gW8LD5Hut5H8CEUQ.jpeg" style="background-image: url(&quot;/content/images/2019/01/1_vWdD55gW8LD5Hut5H8CEUQ.jpeg&quot;);"></a>
+
+    </div>
+
+    <div class="story-body u-flexColumn u-marginTop20 u-relative">
+        <div class="flow-meta u-fontSizeSmallest u-flexCenter">
+            
+                <a href="https://engineering.zalopay.vn/tag/distributed/" class="link--underline u-fontWeightBolder u-textUppercase story-category u-relative zindex4">distributed</a>
+                <span class="point">/</span>
+            
+
+            <span><time class="datetime" datetime=" 2019-01-21 ">2 years ago</time></span>
+        </div>
+
+        <h2 class="u-contentTitle u-fontSize20 u-lineHeightTight u-marginBottom10">
+            <a href="https://engineering.zalopay.vn/consensus/" class="u-relative zindex4">Tìm hiểu bài toán đồng thuận trong hệ thống phân tán (Phần 1)</a>
+        </h2>
+
+
+        <a href="https://engineering.zalopay.vn/consensus/" class="u-absolute0 u-zindex2"></a>
+    </div>
+
+</article>
+            </div>
+
+
+        </div>
+    </div>
+</section>
+
+
+
+<div class="instagram u-overflowHidden u-hide u-relative u-backgroundWhite">
+    <div class="instagram-wrap row"></div>
+    <span class="instagram-name u-absolute"></span>
+</div>
+</main>
+
+    <footer class="footer u-fontSizeSmaller u-fontWeightBold">
+    <div class="footer-links">
+
+        <div class="extreme-container u-flexCenter u-flexColumn">
+            <aside class="follow followMe u-textColorWhite u-fontSize20 u-textAlignCenter">
+                
+                
+                
+            </aside>
+
+            <ul class="footer-menu u-textUppercase u-textAlignCenter u-marginTop20 u-hide"></ul>
+        </div>
+
+
+    </div>
+
+    <div class="footer-copy u-textAlignCenter">
+        © 2020 <a href="http://engineering.zalopay.vn/">ZaloPay Engineering</a>
+        Design with <i class="i-favorite animated infinite pulse" style="color:red;display:inline-block"></i> by <a href="https://goo.gl/Jf1tZe" target="_blank" title="Developer FullStack.">@GodoFredoNinja</a>
+    </div>
+</footer>
+
+    <div class="search u-fixed">
+    <form class="search-form u-relative u-sizeFullWidth u-marginAuto u-marginBottom20">
+        <input id="search-field" class="u-sizeFullWidth u-md-fontSizeBase u-fontSize40 u-fontWeightSemibold" type="text" placeholder="Search...">
+    </form>
+
+    <div id="searchResults" class="search-results u-marginAuto u-sizeFullWidth"></div>
+</div>
+
+    <div class="loadingBar"></div>
+
+    
+
+    <script src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/jquery.min.js"></script>
+
+    
+
+    <script src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/main.js"></script>
+
+    
+<div id="fb-root"></div>
+
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://engineering.zalopay.vn/bai-toan-cai-thien-toc-do-do-du-lieu-vao-zas-2/';
+        this.page.identifier = 'ghost-5e05d179e6b9c70001a07cb2';
+    };
+
+    var $showComments = $('.post-comments-show');
+
+    (function(d, s, id) {
+        if (typeof disqusShortName !== 'undefined') {
+            $('.mapache-disqus').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js = d.createElement(s);
+            js.src = 'https://'+disqusShortName+'.disqus.com/embed.js';
+            js.async = true;
+
+            js.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(js);
+        } else if (typeof facebookLocaleComments !== 'undefined') {
+            $('.mapache-facebook').removeClass('u-hide');
+            $showComments.removeClass('u-hide');
+
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = 'https://connect.facebook.net/'+facebookLocaleComments+'/sdk.js#xfbml=1&version=v3.1';
+            js.async = true;
+            fjs.parentNode.insertBefore(js, fjs);
+        } else {
+            $showComments.remove();
+        }
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+    <script>
+        Prism.plugins.autoloader.languages_path = 'http://engineering.zalopay.vn/assets/scripts/components/';
+        $('.post-body').find('pre').addClass('line-numbers');
+    </script>
+
+    <script>WebFontConfig ={google:{families:['Ruda:400,700,900','Merriweather:300,400,700','Fira+Mono:400']}};(function(){var wf=document.createElement('script');wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';wf.type='text/javascript';wf.async='true';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(wf,s);})();</script>
+
+
+<iframe style="display: none;" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(2).html"></iframe><div id="vQPeVaT-1603449029307" class="" style="display: block !important;"><iframe id="OyWypk3-1603449029308" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(3).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; position: static !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 350px !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; display: none !important; height: 120px !important;"></iframe><iframe id="BQULWoe-1603449029310" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(4).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; z-index: 1000001 !important; cursor: auto !important; float: none !important; pointer-events: auto !important; box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 10px 0px !important; height: 60px !important; min-height: 60px !important; max-height: 60px !important; width: 60px !important; min-width: 60px !important; max-width: 60px !important; border-radius: 50% !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; margin: 0px !important; top: auto !important; bottom: 20px !important; right: 20px !important; left: auto !important; display: block !important;"></iframe><iframe id="B6hhaoi-1603449029310" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(5).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; display: none !important; z-index: 1000003 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; top: auto !important; bottom: 60px !important; right: 15px !important; left: auto !important; width: 21px !important; max-width: 21px !important; min-width: 21px !important; height: 21px !important; max-height: 21px !important; min-height: 21px !important;"></iframe><iframe id="x3OW0nY-1603449029449" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(6).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; padding: 0px !important; transition-property: none !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; transform: rotate(0deg) translateZ(0px) !important; transform-origin: 0px center 0px !important; bottom: 30px !important; top: auto !important; right: 0px !important; left: auto !important; width: 124px !important; max-width: 124px !important; min-width: 124px !important; height: 95px !important; max-height: 95px !important; min-height: 95px !important; z-index: 1000002 !important; margin: 0px !important; display: none !important;"></iframe><div class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 100% !important; display: none !important; z-index: 1000001 !important; cursor: move !important; float: left !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="Huoz3qq-1603449029307" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 6px !important; height: 100% !important; display: block !important; z-index: 999998 !important; cursor: w-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="kiEY3BB-1603449029307" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: 0px !important; bottom: auto !important; left: auto !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 100% !important; height: 6px !important; display: block !important; z-index: 999998 !important; cursor: n-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><div id="BnJLCzW-1603449029307" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; top: 0px !important; right: auto !important; bottom: auto !important; left: 0px !important; position: absolute !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 12px !important; height: 12px !important; display: block !important; z-index: 999998 !important; cursor: nw-resize !important; float: none !important; border-radius: unset !important; pointer-events: auto !important;"></div><iframe id="uMNZg8t-1603449029662" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(7).html" frameborder="0" scrolling="no" title="chat widget" class="" style="outline: none !important; visibility: visible !important; resize: none !important; box-shadow: none !important; overflow: visible !important; background: none transparent !important; opacity: 1 !important; position: fixed !important; border: 0px !important; min-height: auto !important; min-width: auto !important; max-height: none !important; max-width: none !important; padding: 0px !important; margin: 0px !important; transition-property: none !important; transform: none !important; width: 378px !important; height: 876px !important; display: none !important; z-index: 999999 !important; cursor: auto !important; float: none !important; border-radius: unset !important; pointer-events: auto !important; bottom: 100px !important; top: auto !important; right: 20px !important; left: auto !important;"></iframe></div><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./Bài toán cải thiện tốc độ đổ dữ liệu vào ZAS_files/saved_resource(8).html"></iframe><div id="eJOY__extension_root" class="eJOY__extension_root_class" style="all: unset;"></div></body></html>
